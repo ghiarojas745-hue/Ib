@@ -1,0 +1,2181 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body>
+<title>Tarjetas IB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500&family=Noto+Sans+Math&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<style>
+/* Layout: una sola columna de estudio; la tarjeta es una ficha rayada (index card) con la línea roja arriba */
+:root{
+  --bg:#e9edf2; --surface:#f7f9fb; --card:#ffffff; --fg:#17202b; --muted:#5b6776; --line:#d3dae3;
+  --rule:#c9dcef; --redline:#e0707a;
+  --q:#0c7f74; --q-soft:#d5efeb; --f:#c4561a; --f-soft:#fbe4d6; --d:#5b45c9; --d-soft:#e6e1fa; --hl:#8a5a00; --hl-soft:#f8ecc9; --t:#2d5f93; --t-soft:#dde9f6;
+  --ok:#1f8a4c; --bad:#c23b3b; --accent:#17202b;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --math:"Noto Sans Math", "STIX Two Math", "Cambria Math", math;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12171e; --surface:#19202a; --card:#1f2833; --fg:#e6ebf1; --muted:#98a4b3; --line:#2e3946;
+  --rule:#2a3a4c; --redline:#b3525c;
+  --q:#4fc7b9; --q-soft:#163a37; --f:#f0955e; --f-soft:#3e2618; --d:#a594f5; --d-soft:#2a2448; --hl:#f0c85a; --hl-soft:#3a3016; --t:#8dbbeb; --t-soft:#1b2d42;
+  --ok:#52c37f; --bad:#f07474; --accent:#e6ebf1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12171e; --surface:#19202a; --card:#1f2833; --fg:#e6ebf1; --muted:#98a4b3; --line:#2e3946;
+  --rule:#2a3a4c; --redline:#b3525c;
+  --q:#4fc7b9; --q-soft:#163a37; --f:#f0955e; --f-soft:#3e2618; --d:#a594f5; --d-soft:#2a2448; --hl:#f0c85a; --hl-soft:#3a3016; --t:#8dbbeb; --t-soft:#1b2d42;
+  --ok:#52c37f; --bad:#f07474; --accent:#e6ebf1; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:20px 48px}
+.wrap{max-width:720px;margin:0 auto;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.8rem,5vw,2.4rem);font-weight:800}
+h2{font-size:1.25rem;font-weight:700}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.streak{font-family:var(--mono);font-size:.8rem;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--surface);white-space:nowrap}
+.streak b{font-size:1rem}
+.chip{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;padding:3px 9px;border-radius:999px;font-weight:500}
+.chip.Q{background:var(--q-soft);color:var(--q)} .chip.F{background:var(--f-soft);color:var(--f)} .chip.D{background:var(--d-soft);color:var(--d)} .chip.H{background:var(--hl-soft);color:var(--hl)} .chip.T{background:var(--t-soft);color:var(--t)} .chip.X{background:var(--line);color:var(--muted)}
+.today{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:grid;gap:16px}
+.today .what{display:grid;gap:8px}
+.today .blocks{font-family:var(--display);font-size:clamp(1.35rem,4.2vw,1.8rem);font-weight:700;line-height:1.2}
+.counts{display:flex;gap:10px;flex-wrap:wrap}
+.count{flex:1 1 140px;border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
+.count .n{font-family:var(--display);font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums}
+.count .l{font-size:.85rem;color:var(--muted)}
+button{font:inherit;cursor:pointer;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:10px 16px}
+button:focus-visible,summary:focus-visible,td button:focus-visible,input:focus-visible{outline:3px solid var(--d);outline-offset:2px}
+.primary{background:var(--accent);color:var(--bg);border-color:var(--accent);font-family:var(--display);font-weight:700;font-size:1.1rem;padding:14px 20px}
+.linkish{background:none;border:none;padding:0;color:var(--muted);text-decoration:underline;font-size:.9rem}
+/* plan realista */
+.planbox{display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px}
+.phases{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.phase{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px;display:grid;gap:4px;align-content:start}
+.phase.now{border-color:var(--accent);box-shadow:inset 0 3px 0 var(--accent)}
+.phase .w{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.phase b{font-family:var(--display);font-size:1.05rem}
+.phase p{margin:0;font-size:.88rem;color:var(--muted);line-height:1.4}
+.settings{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.settings label{display:flex;gap:8px;align-items:center;font-size:.92rem}
+.settings input[type=time]{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg)}
+.toggle{display:inline-flex;align-items:center;gap:8px}
+.toggle input{width:18px;height:18px;accent-color:var(--accent)}
+.eta{font-size:.95rem} .eta b{font-family:var(--display)}
+/* sesión */
+.session{display:grid;gap:14px}
+.sbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.progress{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.timer{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.9rem;color:var(--muted)}
+.timer.over{color:var(--hl)}
+.fcard{position:relative;background:var(--card);border-radius:14px;min-height:300px;padding:44px 24px 24px;box-shadow:0 1px 0 var(--line),0 10px 30px -18px rgba(10,20,40,.45);cursor:pointer;
+  background-image:linear-gradient(var(--redline),var(--redline)),repeating-linear-gradient(to bottom,transparent 0,transparent 31px,var(--rule) 31px,var(--rule) 32px);
+  background-size:100% 2px,100% 100%;background-position:0 30px,0 30px;background-repeat:no-repeat,no-repeat;display:grid;align-content:start;gap:14px}
+.fcard .meta{position:absolute;top:8px;left:24px;right:24px;display:flex;justify-content:space-between;gap:8px}
+.fcard .front{font-family:var(--display);font-size:clamp(1.25rem,4vw,1.55rem);font-weight:700;line-height:1.28;padding-top:6px;min-width:0}
+.fcard .back{font-size:1.05rem;line-height:1.85;border-top:2px dotted var(--line);padding-top:10px;min-width:0;display:grid;gap:4px}
+.fcard .back p{margin:0;overflow-x:auto;overflow-y:hidden}
+.fcard .hint{color:var(--muted);font-size:.9rem;margin-top:auto}
+math{font-family:var(--math);font-size:1.08em}
+.fcard .front math{font-weight:400}
+.tex-raw{font-family:var(--mono);font-size:.9em;background:var(--line);padding:0 4px;border-radius:4px}
+.answer{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.answer button{padding:16px;font-family:var(--display);font-weight:700;font-size:1.05rem}
+.answer .no{border-color:var(--bad);color:var(--bad)} .answer .yes{border-color:var(--ok);color:var(--ok)}
+.answer small{display:block;font-family:var(--mono);font-weight:500;font-size:.68rem;opacity:.8;margin-top:2px}
+.banner{border:1px solid var(--hl);background:var(--hl-soft);color:var(--fg);border-radius:12px;padding:10px 14px;font-size:.95rem}
+.done{text-align:left;display:grid;gap:12px}
+/* plan */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.9rem}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+tr:last-child td{border-bottom:none}
+td button{all:unset;cursor:pointer;display:grid;gap:4px;width:100%;border-radius:8px;padding:4px}
+td button:hover{background:var(--card)}
+td.now{background:var(--card);box-shadow:inset 3px 0 0 var(--accent)}
+td .t{font-size:.86rem;line-height:1.3}
+/* progreso */
+.blist{display:grid;gap:8px}
+.brow{display:grid;grid-template-columns:minmax(0,1fr) 120px;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left}
+.brow .n{font-weight:700;font-size:.95rem} .brow .s{font-size:.8rem;color:var(--muted)}
+.stack{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--line)}
+.stack i{display:block;height:100%}
+.b1{background:var(--bad)} .b2{background:var(--hl)} .b3{background:var(--ok)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--line)}
+.legend .l1::before{background:var(--bad)} .legend .l2::before{background:var(--hl)} .legend .l3::before{background:var(--ok)}
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+summary{cursor:pointer;font-family:var(--display);font-weight:700}
+details ol{padding-left:20px;margin:10px 0 0;display:grid;gap:6px}
+.savestate{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+@media (max-width:560px){.phases{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.brow{grid-template-columns:minmax(0,1fr) 80px}.fcard{padding:44px 16px 20px}.fcard .meta{left:16px;right:16px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow" id="dateline">…</div>
+      <h1>Tarjetas IB</h1>
+    </div>
+    <div class="pills">
+      <div class="streak" id="hourPill" hidden></div>
+      <div class="streak" id="streak">Racha: <b>0</b> días</div>
+    </div>
+  </header>
+
+  <section id="main" aria-live="polite"></section>
+
+  <section class="planbox" aria-labelledby="planh">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap">
+      <h2 id="planh">Tu plan hasta los exámenes</h2>
+      <span class="eyebrow" id="deckcount"></span>
+    </div>
+    <div class="eta" id="eta"></div>
+    <div class="phases" id="phases"></div>
+    <div class="settings">
+      <label for="hourInput">Mi hora fija <input type="time" id="hourInput" value="16:00"></label>
+      <label class="toggle" for="examToggle"><input type="checkbox" id="examToggle"> Modo examen (35 tarjetas, ~25 min)</label>
+    </div>
+  </section>
+
+  <section>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <h2>Rotación de 2 semanas</h2>
+      <span class="eyebrow">Toca un día para hacerlo</span>
+    </div>
+    <div class="tablewrap"><table id="plan"></table></div>
+  </section>
+
+  <section>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <h2>Tu progreso por bloque</h2>
+      <div class="legend"><span class="l1">Caja 1 · falladas</span><span class="l2">Caja 2</span><span class="l3">Caja 3 · dominadas</span><span>Sin ver</span></div>
+    </div>
+    <div class="blist" id="blist"></div>
+  </section>
+
+  <details>
+    <summary>¿Cómo funciona?</summary>
+    <ol>
+      <li>Cada día abres la app a tu hora fija y tocas <b>Empezar</b>. Son 15 minutos.</li>
+      <li>Primero salen tus <b>falladas</b> (caja 1): las tarjetas que no supiste en días anteriores. Unos 5 minutos.</li>
+      <li>Después sale el <b>tema del día</b> según la rotación. Unos 10 minutos, máximo 20 tarjetas.</li>
+      <li>Lee la pregunta, respóndela <b>en voz alta o en tu cabeza</b> antes de voltear. Luego marca si la sabías.</li>
+      <li><b>No la sabía</b> → vuelve a la caja 1 y la verás mañana. <b>La sabía</b> → sube de caja. En caja 3 descansa unas 4 semanas.</li>
+      <li>El domingo solo repasas falladas, o descansas. Si faltas un día, no recuperas: sigues con lo que toca hoy.</li>
+      <li>El <b>modo examen</b> sube el tope a 35 tarjetas y hace que las dominadas vuelvan cada 2 semanas. Actívalo solo en las semanas antes de mocks o exámenes.</li>
+    </ol>
+    <p class="savestate" id="savestate" style="margin:10px 0 0"></p>
+  </details>
+</div>
+
+<script type="text/plain" id="deck">
+## Q-S1 | Q | Structure 1 | Partículas, átomo, configuración electrónica, mol, gases
+Q: Compuesto vs mezcla
+A: Compuesto: elementos unidos químicamente en proporción fija; solo se separa por reacción química.
+A: Mezcla: sin unión química, proporción variable; se separa por métodos físicos.
+
+Q: ¿Qué indica la temperatura en kelvin?
+A: Es proporcional a la energía cinética media de las partículas.
+A: $T(\text{K}) = T(^\circ\text{C}) + 273.15$. A 0 K la energía cinética es mínima.
+
+Q: Define isótopos
+A: Átomos del mismo elemento (mismo número de protones) con distinto número de neutrones.
+A: Mismas propiedades químicas, distintas propiedades físicas (masa, densidad).
+
+Q: ¿Cómo se calcula la masa atómica relativa $A_r$?
+A: Promedio ponderado de las masas de los isótopos según su abundancia, relativo a 1/12 de la masa del carbono-12.
+A: $A_r = \dfrac{\sum (\text{masa} \times \%\text{abundancia})}{100}$
+
+Q: ¿Por qué el espectro de emisión del H es de líneas y no continuo?
+A: Los electrones solo ocupan niveles de energía discretos. Al bajar de nivel emiten un fotón cuya energía es la diferencia entre niveles: $\Delta E = hf$.
+
+Q: En el espectro del H, ¿por qué las líneas convergen a mayor frecuencia?
+A: Porque los niveles de energía se acercan entre sí al aumentar $n$.
+
+Q: Regla de Hund y principio de exclusión de Pauli
+A: Hund: en orbitales de igual energía, los electrones se colocan primero desapareados y con espines paralelos.
+A: Pauli: máximo 2 electrones por orbital, con espines opuestos.
+
+Q: Configuración electrónica de Cr y Cu
+A: Cr: [Ar] 3d⁵ 4s¹
+A: Cu: [Ar] 3d¹⁰ 4s¹
+A: Un subnivel d semilleno o lleno es más estable.
+
+Q: Fórmula empírica vs molecular
+A: Empírica: proporción entera más simple de átomos.
+A: Molecular: número real de átomos; es un múltiplo entero de la empírica.
+
+Q: Ley de Avogadro
+A: Volúmenes iguales de gases, a la misma temperatura y presión, contienen el mismo número de partículas.
+
+Q: Supuestos del modelo de gas ideal
+A: Partículas de volumen despreciable, sin fuerzas intermoleculares, choques perfectamente elásticos, movimiento aleatorio, $E_k$ media $\propto T$ (en K).
+
+Q: ¿Cuándo se desvían los gases reales del comportamiento ideal?
+A: A presión alta y temperatura baja: el volumen de las partículas y las fuerzas intermoleculares dejan de ser despreciables.
+
+Q: Ecuación de los gases ideales y sus unidades SI
+A: $PV = nRT$
+A: $P$ en Pa, $V$ en m³, $n$ en mol, $R = 8.31\ \text{J K}^{-1}\text{mol}^{-1}$, $T$ en K.
+A: Error típico: usar dm³ o °C sin convertir.
+
+H: Define primera energía de ionización
+A: Energía mínima para quitar un mol de electrones de un mol de átomos gaseosos en estado fundamental:
+A: $\text{X(g)} \rightarrow \text{X}^{+}\text{(g)} + e^{-}$
+
+H: ¿Qué muestran las energías de ionización sucesivas?
+A: Un salto grande indica que el siguiente electrón sale de un nivel más interno. Los electrones antes del gran salto = electrones de valencia (grupo).
+
+H: ¿Por qué la 1.ª EI baja de Mg a Al, y de P a S?
+A: Mg→Al: el electrón del Al está en 3p, más alto en energía y más apantallado que 3s.
+A: P→S: en S hay un par de electrones en un orbital 3p; la repulsión facilita quitar uno.
+
+H: Límite de convergencia: qué es y para qué sirve
+A: Frecuencia donde las líneas del espectro se juntan (transición hasta $n = \infty$). Con $E = hf$ permite calcular la energía de ionización.
+
+Q: Técnicas de separación y qué propiedad aprovecha cada una
+A: Filtración: sólido insoluble. Evaporación/cristalización: soluto disuelto.
+A: Destilación simple o fraccionada: diferencia de puntos de ebullición.
+A: Cromatografía: distinta afinidad por las fases. Embudo de separación: líquidos inmiscibles.
+
+Q: Nombra los cambios de estado
+A: Fusión (s→l), solidificación (l→s), vaporización (l→g), condensación (g→l), sublimación (s→g), deposición (g→s).
+
+Q: Notación nuclear ${}^{A}_{Z}\text{X}$
+A: $Z$ = número atómico (protones). $A$ = número másico (protones + neutrones).
+A: Neutrones $= A - Z$. En un ion, electrones $= Z -$ carga.
+
+H: ¿Cómo se obtiene $A_r$ de un espectro de masas?
+A: Cada pico es un isótopo: su posición da la masa ($m/z$) y su altura, la abundancia relativa. Se calcula el promedio ponderado.
+
+Q: Relación entre velocidad de la luz, frecuencia, longitud de onda y energía
+A: $c = \lambda f$ y $E = hf = \dfrac{hc}{\lambda}$
+A: Mayor frecuencia → menor longitud de onda → mayor energía.
+
+Q: Series del espectro del hidrógeno
+A: Lyman: caídas a $n = 1$, en UV.
+A: Balmer: caídas a $n = 2$, en luz visible.
+
+Q: Subniveles: número de orbitales y máximo de electrones
+A: s: 1 orbital (2 e⁻) · p: 3 (6 e⁻) · d: 5 (10 e⁻) · f: 7 (14 e⁻)
+A: Un nivel $n$ admite como máximo $2n^2$ electrones.
+
+Q: Configuración de iones de metales de transición: ¿qué electrones salen primero?
+A: Los 4s salen antes que los 3d.
+A: Ej.: Fe = [Ar] 3d⁶ 4s² → Fe²⁺ = [Ar] 3d⁶
+
+Q: Mol, masa y número de partículas
+A: $n = \dfrac{m}{M}$ y $N = n N_A$, con $N_A = 6.02 \times 10^{23}\ \text{mol}^{-1}$
+
+Q: Concentración molar y dilución
+A: $c = \dfrac{n}{V}$ (mol dm⁻³, con $V$ en dm³)
+A: Dilución: $c_1 V_1 = c_2 V_2$
+
+Q: Volumen molar de un gas ideal
+A: 22.7 dm³ mol⁻¹ a STP (273 K y 100 kPa).
+A: $n = \dfrac{V}{22.7}$ (con $V$ en dm³, a STP)
+
+Q: Ley combinada de los gases
+A: $\dfrac{P_1 V_1}{T_1} = \dfrac{P_2 V_2}{T_2}$ para una cantidad fija de gas (T en K).
+
+Q: ¿Cómo se calcula la masa molar de un gas con la ecuación de los gases?
+A: $M = \dfrac{mRT}{PV}$
+
+## Q-S2 | Q | Structure 2 | Enlace iónico, covalente, metálico y materiales
+Q: ¿Qué es el enlace iónico?
+A: Atracción electrostática entre iones de carga opuesta en una red. Se forma por transferencia de electrones (típico: metal + no metal).
+
+Q: ¿Por qué los compuestos iónicos tienen alto punto de fusión y solo conducen fundidos o disueltos?
+A: Hay atracciones fuertes en toda la red. En el sólido los iones no se mueven; fundidos o disueltos quedan libres para moverse y llevar carga.
+
+Q: ¿De qué depende la entalpía de red?
+A: Es mayor cuanto mayor es la carga de los iones y menor su radio.
+
+Q: Enlace covalente coordinado (dativo)
+A: Los dos electrones del par compartido vienen del mismo átomo. Ej.: NH₄⁺, H₃O⁺, CO.
+
+Q: VSEPR: forma y ángulo del H₂O
+A: 4 dominios, 2 pares libres → angular, ~104.5°.
+A: Los pares libres repelen más que los pares de enlace.
+
+Q: ¿Cuándo una molécula es polar?
+A: Cuando tiene enlaces polares Y su geometría no cancela los dipolos.
+A: Ej.: CO₂ es no polar (lineal); H₂O es polar (angular).
+
+Q: Ordena las fuerzas intermoleculares (masas similares)
+A: Fuerzas de London < dipolo–dipolo < puentes de hidrógeno.
+
+Q: Condición para un puente de hidrógeno
+A: H unido a N, O o F, atraído por un par libre de N, O o F de otra molécula.
+
+Q: Enlace metálico
+A: Atracción electrostática entre cationes metálicos en red y un mar de electrones deslocalizados. Explica conductividad y maleabilidad.
+
+Q: ¿Qué es una aleación y por qué es más dura?
+A: Mezcla de un metal con otros elementos. Átomos de distinto tamaño distorsionan las capas y dificultan que se deslicen.
+
+Q: Polímeros de adición
+A: Monómeros con doble enlace C=C que se unen abriendo el enlace; no hay subproducto. Ej.: polieteno a partir de eteno.
+
+Q: $R_f$ en cromatografía
+A: $R_f = \dfrac{\text{distancia recorrida por la sustancia}}{\text{distancia del frente del solvente}}$
+A: Depende de la afinidad por la fase móvil vs la estacionaria.
+
+H: Enlace sigma (σ) vs pi (π)
+A: σ: solapamiento frontal, densidad sobre el eje entre núcleos.
+A: π: solapamiento lateral de orbitales p, densidad arriba y abajo del eje.
+A: Doble = 1σ + 1π; triple = 1σ + 2π.
+
+H: Hibridación del C en CH₄, C₂H₄ y C₂H₂
+A: CH₄: sp³, tetraédrico, 109.5°
+A: C₂H₄: sp², trigonal plana, 120°
+A: C₂H₂: sp, lineal, 180°
+
+H: Carga formal: fórmula y para qué sirve
+A: $\text{CF} = V - \left(N + \tfrac{1}{2}B\right)$, con $V$ = e⁻ de valencia, $N$ = e⁻ no enlazantes, $B$ = e⁻ enlazantes.
+A: La estructura de Lewis preferida tiene cargas formales más cercanas a cero.
+
+H: Evidencia de la deslocalización en el benceno
+A: Todos los enlaces C–C miden lo mismo (entre simple y doble); es más estable de lo esperado (hidrogenación menos exotérmica); reacciona por sustitución, no por adición.
+
+H: Forma de SF₆ y XeF₄
+A: SF₆: 6 dominios, octaédrica, 90°.
+A: XeF₄: 6 dominios con 2 pares libres → cuadrada plana.
+
+H: Polímeros de condensación
+A: Monómeros con dos grupos funcionales que se unen liberando una molécula pequeña (H₂O o HCl). Ej.: poliésteres y poliamidas (nailon).
+
+Q: Iones poliatómicos que debes saber
+A: NH₄⁺ amonio · OH⁻ hidróxido · NO₃⁻ nitrato · HCO₃⁻ hidrogenocarbonato
+A: CO₃²⁻ carbonato · SO₄²⁻ sulfato · PO₄³⁻ fosfato
+
+Q: Regla del octeto y sus excepciones
+A: Los átomos tienden a quedar con 8 electrones de valencia.
+A: Excepciones: octeto incompleto en Be y B (BeCl₂, BF₃); H queda con 2.
+
+Q: Longitud y fuerza de enlaces simples, dobles y triples
+A: Triple > doble > simple en fuerza.
+A: Triple < doble < simple en longitud (más electrones compartidos → núcleos más cerca).
+
+Q: Formas VSEPR con 2, 3 y 4 dominios
+A: 2: lineal 180° · 3: trigonal plana 120° · 4: tetraédrica 109.5°
+A: 4 con 1 par libre: piramidal ~107° · 4 con 2 pares libres: angular ~104.5°
+
+Q: Estructuras covalentes de red: diamante, grafito, grafeno, SiO₂
+A: Diamante: cada C con 4 enlaces, muy duro, no conduce.
+A: Grafito: cada C con 3 enlaces, capas con electrones deslocalizados → conduce, blando.
+A: Grafeno: una sola capa de grafito. SiO₂: red tetraédrica, muy alto punto de fusión.
+
+Q: Punto de ebullición y solubilidad en compuestos covalentes
+A: Más fuerzas intermoleculares → mayor punto de ebullición.
+A: «Lo semejante disuelve lo semejante»: polares en agua, no polares en solventes no polares. No conducen (no hay cargas libres).
+
+Q: Diferencia de electronegatividad y tipo de enlace
+A: $\Delta\chi$ pequeña: covalente no polar; intermedia: covalente polar; grande: iónico.
+A: En el triángulo de enlace, el eje vertical es $\Delta\chi$ y el horizontal el $\chi$ promedio.
+
+Q: ¿De qué depende la fuerza del enlace metálico?
+A: Mayor carga del catión, menor radio y más electrones deslocalizados → enlace más fuerte.
+A: Por eso el punto de fusión sube Na < Mg < Al.
+
+H: ¿Por qué los metales de transición tienen puntos de fusión altos?
+A: Además de los 4s, aportan electrones 3d al mar deslocalizado → enlace metálico más fuerte.
+
+Q: Plásticos y medio ambiente
+A: Los polímeros de adición son muy estables y poco biodegradables: se acumulan. Opciones: reciclaje, reducción de uso, bioplásticos.
+
+H: Estructuras de resonancia
+A: Cuando una sola estructura de Lewis no basta, los electrones π están deslocalizados entre varias posiciones.
+A: Ej.: CO₃²⁻, tres enlaces C–O iguales con orden de enlace $1\tfrac{1}{3}$.
+
+H: Formas con 5 dominios de electrones
+A: 5 enlazantes: bipiramidal trigonal (90° y 120°), ej. PCl₅.
+A: 1 par libre: balancín (SF₄) · 2: forma de T (ClF₃) · 3: lineal (XeF₂).
+
+H: Formas con 6 dominios y pares libres
+A: 6 enlazantes: octaédrica (SF₆) · 1 par libre: piramidal cuadrada (BrF₅) · 2: cuadrada plana (XeF₄).
+
+## Q-S3 | Q | Structure 3 | Tabla periódica y química orgánica
+Q: Tendencia del radio atómico
+A: Disminuye a lo largo de un período (más carga nuclear, mismo nivel). Aumenta al bajar en un grupo (más niveles).
+
+Q: Electronegatividad: definición y tendencia
+A: Capacidad de un átomo de atraer el par de electrones de un enlace. Aumenta hacia la derecha y hacia arriba (F es el máximo).
+
+Q: ¿Por qué un catión es más pequeño que su átomo?
+A: Pierde electrones (a veces toda la capa externa) y la carga nuclear atrae con más fuerza a los que quedan.
+
+Q: Óxidos de metales vs de no metales en agua
+A: Metales → básicos: Na₂O + H₂O → 2NaOH
+A: No metales → ácidos: SO₃ + H₂O → H₂SO₄ (lluvia ácida).
+
+Q: Reactividad en el grupo 1 y en el grupo 17
+A: Grupo 1: aumenta al bajar (es más fácil perder el electrón).
+A: Grupo 17: disminuye al bajar (es más difícil ganar un electrón).
+
+Q: ¿Qué es una serie homóloga?
+A: Compuestos con el mismo grupo funcional y fórmula general, que difieren en CH₂. Química similar, propiedades físicas en gradación.
+
+Q: Isómeros estructurales
+A: Misma fórmula molecular, distinta fórmula estructural (cadena, posición o grupo funcional).
+
+Q: Alcoholes primarios, secundarios y terciarios
+A: Según cuántos carbonos están unidos al C que lleva el –OH: 1, 2 o 3.
+
+Q: Nombra: –COOH, –CHO, C=O en medio de la cadena, –COO–
+A: Ácido carboxílico, aldehído, cetona, éster.
+
+H: ¿Qué información da el espectro IR?
+A: Identifica enlaces y grupos funcionales por su número de onda de absorción. Ej.: O–H banda ancha; C=O ~1700 cm⁻¹ (ver data booklet).
+
+H: Espectrometría de masas en orgánica
+A: El pico M⁺ da la masa molar; los fragmentos ayudan a deducir la estructura (ej. $m/z = 15$ es CH₃⁺).
+
+H: ¹H RMN: número de señales y área
+A: Número de señales = ambientes distintos de H.
+A: Área (integración) = proporción de H en cada ambiente.
+A: Desplazamiento químico = tipo de ambiente.
+
+H: ¿Qué es un metal de transición y sus propiedades?
+A: Elemento que forma al menos un ion con subnivel d incompleto. Estados de oxidación variables, iones coloreados, forman complejos, son catalizadores, magnetismo.
+
+H: ¿Por qué los complejos de metales de transición son coloreados?
+A: Los ligandos separan los orbitales d en dos niveles. Un electrón absorbe luz de cierta frecuencia al saltar; vemos el color complementario.
+
+H: Isomería cis-trans
+A: Por rotación restringida (C=C o anillo) con dos grupos distintos en cada C. Cis: mismo lado; trans: lados opuestos.
+
+H: Isomería óptica
+A: Carbono quiral (4 grupos distintos). Los enantiómeros son imágenes especulares no superponibles y rotan la luz polarizada en sentidos opuestos. Mezcla racémica: 50/50, sin rotación neta.
+
+H: ¹H RMN: desdoblamiento
+A: Regla $n + 1$: una señal se divide en $n + 1$ picos, donde $n$ = número de H en carbonos vecinos. Ej.: CH₃ junto a CH₂ → triplete.
+
+Q: Bloques, grupos y períodos de la tabla periódica
+A: Bloques s, p, d, f según el subnivel que se llena.
+A: Período = número de niveles ocupados. Grupo (principales) = electrones de valencia.
+
+Q: Primera afinidad electrónica
+A: Energía cuando un mol de átomos gaseosos gana un mol de electrones: $\text{X(g)} + e^- \rightarrow \text{X}^-\text{(g)}$. Suele ser exotérmica.
+
+Q: Tendencia de la energía de ionización
+A: Aumenta a lo largo del período (más carga nuclear, radio menor) y disminuye al bajar en el grupo (electrón más lejos y más apantallado).
+
+Q: Reglas de los números de oxidación
+A: Elemento libre: 0 · O: −2 (excepto peróxidos) · H: +1 (excepto hidruros metálicos) · la suma iguala la carga total.
+A: Ej.: Mn en MnO₄⁻ es +7.
+
+Q: Carácter metálico y óxidos anfóteros
+A: El carácter metálico disminuye a lo largo del período.
+A: Al₂O₃ es anfótero: reacciona con ácidos y con bases.
+
+Q: Reacciones típicas de grupo 1 y grupo 17
+A: $2\text{Na} + 2\text{H}_2\text{O} \rightarrow 2\text{NaOH} + \text{H}_2$
+A: Desplazamiento de halógenos: $\text{Cl}_2 + 2\text{Br}^- \rightarrow 2\text{Cl}^- + \text{Br}_2$
+
+Q: Formas de representar compuestos orgánicos
+A: Fórmula estructural completa, condensada, esquelética y estereoquímica (con cuñas).
+
+Q: Punto de ebullición en una serie homóloga
+A: Aumenta con la longitud de la cadena (más fuerzas de London).
+A: Las ramificaciones lo bajan (menos superficie de contacto).
+
+Q: Nombres IUPAC: prefijos y ejemplos
+A: 1 met · 2 et · 3 prop · 4 but · 5 pent · 6 hex
+A: Ej.: propan-2-ol, ácido butanoico, etanoato de etilo.
+
+Q: Más grupos funcionales
+A: Amina –NH₂ · amida –CONH₂ · halogenoalcano –X · éter R–O–R · fenilo –C₆H₅
+
+Q: Saturado vs insaturado y prueba con agua de bromo
+A: Saturado: solo enlaces simples C–C. Insaturado: tiene C=C o C≡C.
+A: Los alquenos decoloran el agua de bromo (naranja → incolora).
+
+H: Índice de deficiencia de hidrógeno (IHD)
+A: $\text{IHD} = \dfrac{2C + 2 + N - H - X}{2}$
+A: Cada anillo o enlace π suma 1. Benceno: IHD = 4.
+
+H: ¿Por qué los metales de transición tienen estados de oxidación variables?
+A: Los subniveles 3d y 4s tienen energías muy parecidas, así que pueden perder distintos números de electrones.
+
+H: ¿De qué depende el color de un complejo?
+A: Del metal, de su estado de oxidación, del número de ligandos y del tipo de ligando (cada uno separa distinto los orbitales d).
+
+H: ¿Por qué se usa TMS en ¹H RMN?
+A: Da una sola señal fuerte, es inerte y volátil. Se fija como referencia: $\delta = 0$ ppm.
+
+## Q-R1 | Q | Reactivity 1 | Energía de las reacciones
+Q: Exotérmica vs endotérmica
+A: Exo: libera calor, $\Delta H < 0$.
+A: Endo: absorbe calor, $\Delta H > 0$.
+
+Q: Calor en calorimetría: qué es cada término
+A: $q = mc\Delta T$: $q$ calor (J), $m$ masa de agua o solución (g), $c = 4.18\ \text{J g}^{-1}\text{K}^{-1}$ para agua, $\Delta T$ cambio de temperatura.
+A: Luego $\Delta H = -\dfrac{q}{n}$
+
+Q: Fuentes de error en calorimetría
+A: Pérdida de calor al entorno (ΔH menos negativo de lo esperado); suponer $c$ y densidad del agua; combustión incompleta.
+
+Q: Ley de Hess
+A: El $\Delta H$ de una reacción no depende del camino, solo de los estados inicial y final.
+
+Q: $\Delta H$ con entalpías de enlace
+A: $\Delta H = \sum E(\text{enlaces rotos}) - \sum E(\text{enlaces formados})$
+A: Romper absorbe energía, formar libera. Son valores medios en fase gaseosa.
+
+Q: $\Delta H$ con entalpías de formación
+A: $\Delta H = \sum \Delta H_f(\text{productos}) - \sum \Delta H_f(\text{reactivos})$
+A: $\Delta H_f$ de un elemento en su estado estándar = 0.
+
+Q: Combustión completa vs incompleta
+A: Completa: CO₂ + H₂O.
+A: Incompleta (poco O₂): CO y/o C (hollín); el CO es tóxico.
+
+Q: Combustibles fósiles: ventajas y desventajas
+A: A favor: alta densidad energética, infraestructura existente.
+A: En contra: no renovables, emiten CO₂ (efecto invernadero) y contaminantes.
+
+Q: Pila de combustible de hidrógeno
+A: Convierte energía química en eléctrica sin combustión. Solo produce agua y es más eficiente que un motor térmico.
+
+H: Ciclo de Born–Haber: ¿qué calcula?
+A: La entalpía de red, usando la ley de Hess con atomización, ionización, afinidad electrónica y entalpía de formación.
+
+H: ¿Qué es la entropía (S)?
+A: Medida de la dispersión de la energía y la materia. Aumenta de sólido → líquido → gas, con más moles de gas y al disolver.
+
+H: Energía de Gibbs: ¿cuándo es espontánea una reacción?
+A: $\Delta G = \Delta H - T\Delta S$, espontánea si $\Delta G < 0$.
+A: $\Delta H < 0$ y $\Delta S > 0$: siempre. $\Delta H > 0$ y $\Delta S < 0$: nunca. Los otros dos casos dependen de $T$.
+
+H: Relación entre $\Delta G^\circ$ y $K$
+A: $\Delta G^\circ = -RT\ln K$
+A: $\Delta G^\circ$ negativo → $K > 1$ (favorece productos).
+
+Q: Perfil de energía de una reacción
+A: Eje Y energía, eje X avance de reacción. La cima es el estado de transición; la altura desde los reactivos es $E_a$.
+A: Exo: productos más abajo. Endo: productos más arriba.
+
+Q: Condiciones estándar
+A: 100 kPa, 298 K y 1 mol dm⁻³ para soluciones. Se indica con °: $\Delta H^\circ$.
+
+Q: Entalpía estándar de combustión y de formación
+A: Combustión: cuando 1 mol de sustancia arde completamente en O₂.
+A: Formación: cuando se forma 1 mol de compuesto a partir de sus elementos en estado estándar.
+
+Q: Corregir la pérdida de calor en calorimetría
+A: Se grafica temperatura vs tiempo y se extrapola la línea de enfriamiento hasta el momento de mezclar para estimar el $\Delta T$ real.
+
+Q: Energía específica vs densidad energética de un combustible
+A: Energía específica: energía por kilogramo (MJ kg⁻¹).
+A: Densidad energética: energía por volumen (MJ m⁻³).
+
+Q: Biocombustibles
+A: Se obtienen de biomasa (ej. etanol por fermentación). En teoría neutros en carbono: el CO₂ que emiten lo absorbieron las plantas.
+A: Problemas: uso de tierras de cultivo, agua, deforestación.
+
+Q: Semirreacciones de la pila de H₂ (medio ácido)
+A: Ánodo: $\text{H}_2 \rightarrow 2\text{H}^+ + 2e^-$
+A: Cátodo: $\text{O}_2 + 4\text{H}^+ + 4e^- \rightarrow 2\text{H}_2\text{O}$
+
+H: Definición IB de entalpía de red
+A: Cambio de entalpía cuando 1 mol de sólido iónico se separa en sus iones gaseosos. Es positiva (endotérmica).
+
+H: Calcular $\Delta S^\circ$ de una reacción
+A: $\Delta S^\circ = \sum S^\circ(\text{productos}) - \sum S^\circ(\text{reactivos})$
+A: Ojo: $S^\circ$ está en J K⁻¹ mol⁻¹; convierte a kJ antes de usar en $\Delta G$.
+
+H: ¿A qué temperatura una reacción se vuelve espontánea?
+A: Cuando $\Delta G = 0$: $T = \dfrac{\Delta H}{\Delta S}$ (con unidades coherentes).
+
+H: Ley de Hess con ciclos de formación o combustión
+A: Formación: flechas desde los elementos hacia reactivos y productos.
+A: Combustión: flechas desde reactivos y productos hacia CO₂ y H₂O.
+
+## Q-R2 | Q | Reactivity 2 | Cuánto, qué tan rápido, qué tan lejos
+Q: Reactivo limitante
+A: El que se consume primero; determina la cantidad máxima de producto.
+
+Q: Rendimiento porcentual
+A: $\%\ \text{rendimiento} = \dfrac{\text{real}}{\text{teórico}} \times 100$
+
+Q: Economía atómica
+A: $\%\ \text{economía atómica} = \dfrac{M(\text{producto deseado})}{\sum M(\text{reactivos})} \times 100$
+A: Mide eficiencia (química verde).
+
+Q: Teoría de colisiones: requisitos para reaccionar
+A: Choque con energía $\geq E_a$ y con la orientación adecuada.
+
+Q: ¿Por qué subir la temperatura aumenta la velocidad?
+A: Principalmente porque más partículas tienen $E \geq E_a$ (curva de Maxwell–Boltzmann). También hay más colisiones por segundo.
+
+Q: ¿Cómo actúa un catalizador?
+A: Ofrece una ruta alternativa con menor $E_a$. No se consume, no cambia $\Delta H$ ni la posición del equilibrio.
+
+Q: Equilibrio dinámico
+A: En sistema cerrado, velocidades directa e inversa son iguales; las concentraciones son constantes (no iguales).
+
+Q: Le Chatelier: efecto de aumentar la presión
+A: El equilibrio se desplaza hacia el lado con menos moles de gas.
+
+Q: ¿Qué cambia el valor de $K$?
+A: Solo la temperatura. Concentración, presión y catalizador no cambian $K$.
+
+Q: Efecto de la temperatura sobre $K$
+A: Directa endotérmica: subir $T$ aumenta $K$.
+A: Directa exotérmica: subir $T$ disminuye $K$.
+
+H: Ecuación de velocidad y orden de reacción
+A: $\text{velocidad} = k[\text{A}]^m[\text{B}]^n$
+A: Los órdenes se determinan experimentalmente, no de los coeficientes.
+
+H: Gráfica velocidad vs concentración según el orden
+A: Orden 0: horizontal. Orden 1: recta que pasa por el origen. Orden 2: curva (parábola).
+
+H: Etapa determinante de la velocidad
+A: La etapa más lenta del mecanismo. La ecuación de velocidad incluye las especies de esa etapa (y las anteriores).
+
+H: Ecuación de Arrhenius
+A: $k = Ae^{-E_a/RT}$
+A: Graficando $\ln k$ vs $\dfrac{1}{T}$ la pendiente es $-\dfrac{E_a}{R}$.
+
+H: $Q$ vs $K$
+A: $Q < K$: avanza hacia productos. $Q > K$: hacia reactivos. $Q = K$: en equilibrio.
+
+H: Unidades de $k$ para orden total 2
+A: $\text{mol}^{-1}\,\text{dm}^3\,\text{s}^{-1}$
+
+Q: Pasos para calcular masa de producto a partir de un reactivo
+A: masa → moles ($n = m/M$) → relación molar de la ecuación → moles de producto → masa.
+
+Q: Velocidad de reacción: definición y cómo medirla
+A: Cambio de concentración por unidad de tiempo (mol dm⁻³ s⁻¹).
+A: Se mide con volumen de gas, pérdida de masa, colorimetría, conductividad o pH.
+
+Q: Velocidad a partir de una gráfica concentración–tiempo
+A: Es la pendiente de la tangente en ese punto. La velocidad inicial se toma en $t = 0$.
+
+Q: Factores que afectan la velocidad
+A: Concentración o presión (más colisiones), área superficial (más partículas expuestas), temperatura (más partículas con $E \geq E_a$), catalizador (menor $E_a$).
+
+Q: Curva de Maxwell–Boltzmann al subir la temperatura
+A: El pico baja y se corre a la derecha; el área total (número de partículas) no cambia. Más área a la derecha de $E_a$.
+
+Q: Expresión de la constante de equilibrio
+A: Para $a\text{A} + b\text{B} \rightleftharpoons c\text{C} + d\text{D}$: $K = \dfrac{[\text{C}]^c[\text{D}]^d}{[\text{A}]^a[\text{B}]^b}$
+A: Sólidos y líquidos puros no aparecen.
+
+Q: ¿Qué indica el tamaño de $K$?
+A: $K \gg 1$: el equilibrio está muy a la derecha (productos). $K \ll 1$: muy a la izquierda.
+
+Q: $K$ al invertir o multiplicar la ecuación
+A: Reacción inversa: $\dfrac{1}{K}$. Ecuación multiplicada por 2: $K^2$.
+
+Q: Proceso Haber: condiciones de compromiso
+A: $\text{N}_2 + 3\text{H}_2 \rightleftharpoons 2\text{NH}_3$, exotérmica.
+A: ~450 °C (velocidad aceptable aunque baje el rendimiento), ~200 atm (favorece NH₃), catalizador de Fe.
+
+H: Molecularidad
+A: Número de partículas que chocan en una etapa elemental: unimolecular, bimolecular o termolecular (rara).
+
+H: Vida media en una reacción de orden 1
+A: Es constante, no depende de la concentración: $t_{1/2} = \dfrac{\ln 2}{k}$
+
+H: Arrhenius con dos temperaturas
+A: $\ln\dfrac{k_2}{k_1} = \dfrac{E_a}{R}\left(\dfrac{1}{T_1} - \dfrac{1}{T_2}\right)$
+
+H: Perfil de energía de una reacción en varias etapas
+A: Cada pico es un estado de transición; cada valle, un intermedio. La etapa con la barrera más alta es la determinante.
+
+H: Calcular concentraciones en el equilibrio
+A: Tabla ICE (inicial, cambio, equilibrio) y se reemplaza en $K$. Si $K$ es muy pequeña, se aproxima que el cambio es despreciable frente a la concentración inicial.
+
+## Q-R3 | Q | Reactivity 3 | Ácidos, redox, radicales y mecanismos
+Q: Ácido y base de Brønsted–Lowry
+A: Ácido: dona H⁺. Base: acepta H⁺. Un par conjugado difiere en un H⁺.
+
+Q: pH y concentración de H⁺
+A: $\text{pH} = -\log[\text{H}^+]$ y $[\text{H}^+] = 10^{-\text{pH}}$
+A: Bajar 1 unidad de pH = 10 veces más [H⁺].
+
+Q: Producto iónico del agua
+A: $K_w = [\text{H}^+][\text{OH}^-] = 1.00 \times 10^{-14}$ a 25 °C.
+A: Neutro significa $[\text{H}^+] = [\text{OH}^-]$; pH 7 solo a 25 °C.
+
+Q: Ácido fuerte vs débil y cómo distinguirlos
+A: Fuerte: se disocia por completo; débil: parcialmente.
+A: A igual concentración el fuerte tiene menor pH, mayor conductividad y reacciona más rápido con Mg o CaCO₃.
+
+Q: Oxidación y reducción
+A: Oxidación: pierde e⁻ / sube el número de oxidación.
+A: Reducción: gana e⁻ / baja. El agente oxidante se reduce.
+
+Q: Celda voltaica: ¿qué pasa en cada electrodo?
+A: Ánodo (−): oxidación. Cátodo (+): reducción.
+A: Los electrones van por el cable del ánodo al cátodo; el puente salino mantiene la neutralidad.
+
+Q: Electrólisis de NaCl fundido
+A: Cátodo (−): $\text{Na}^+ + e^- \rightarrow \text{Na}$
+A: Ánodo (+): $2\text{Cl}^- \rightarrow \text{Cl}_2 + 2e^-$
+
+Q: Fisión homolítica
+A: El enlace se rompe y cada átomo se queda con un electrón → radicales (electrón desapareado). Ej.: Cl₂ con luz UV.
+
+Q: Etapas de la sustitución radicalaria (alcano + halógeno)
+A: Iniciación: se forman radicales. Propagación: un radical reacciona y genera otro. Terminación: dos radicales se unen.
+
+Q: Nucleófilo vs electrófilo
+A: Nucleófilo: dona un par de electrones (OH⁻, NH₃, H₂O).
+A: Electrófilo: acepta un par, es deficiente en electrones (H⁺, NO₂⁺).
+
+H: Solución amortiguadora (buffer)
+A: Resiste cambios de pH al añadir poco ácido o base. Ácido débil + su base conjugada (o base débil + su ácido conjugado).
+
+H: pKa en una titulación
+A: $\text{p}K_a = -\log K_a$. En el punto de semiequivalencia (ácido débil con base fuerte), $\text{pH} = \text{p}K_a$.
+
+H: Ácido y base de Lewis
+A: Ácido: acepta un par de electrones. Base: dona un par.
+A: Ej.: los ligandos de un complejo son bases de Lewis.
+
+H: SN1 vs SN2
+A: SN2: un paso, típico en primarios, $\text{velocidad} = k[\text{RX}][\text{Nu}^-]$, inversión de configuración.
+A: SN1: dos pasos vía carbocatión, típico en terciarios, $\text{velocidad} = k[\text{RX}]$.
+
+H: Potencial de celda y espontaneidad
+A: $E^\circ_{\text{celda}} = E^\circ_{\text{cátodo}} - E^\circ_{\text{ánodo}}$; positivo = espontánea.
+A: $\Delta G^\circ = -nFE^\circ$
+
+H: Adición electrofílica de HBr: regla de Markovnikov
+A: El enlace π ataca al H → carbocatión → Br⁻ se une.
+A: El H va al C que ya tiene más H, porque se forma el carbocatión más estable.
+
+H: Nitración del benceno
+A: Sustitución electrofílica. El electrófilo NO₂⁺ se genera con HNO₃ + H₂SO₄ concentrados.
+
+Q: Especie anfiprótica
+A: Puede donar o aceptar H⁺. Ej.: H₂O, HCO₃⁻.
+
+Q: Reacciones de neutralización típicas
+A: Ácido + base → sal + agua
+A: Ácido + carbonato → sal + agua + CO₂
+A: Ácido + metal reactivo → sal + H₂
+
+Q: Curva de pH ácido fuerte con base fuerte
+A: Punto de equivalencia en pH 7, con un salto vertical grande cerca del volumen de equivalencia.
+
+Q: Serie de reactividad y desplazamiento
+A: Un metal más reactivo desplaza a uno menos reactivo de su solución. Ej.: $\text{Zn} + \text{Cu}^{2+} \rightarrow \text{Zn}^{2+} + \text{Cu}$
+
+Q: Balancear semirreacciones en medio ácido
+A: 1) balancea átomos distintos de O y H · 2) O con H₂O · 3) H con H⁺ · 4) carga con e⁻.
+
+Q: Pilas primarias vs secundarias
+A: Primarias: no recargables (alcalinas). Secundarias: recargables porque la reacción se invierte (ion litio, plomo-ácido).
+
+Q: Celda electrolítica vs voltaica
+A: Electrolítica: usa electricidad para forzar una reacción no espontánea; ánodo positivo, cátodo negativo.
+A: Voltaica: reacción espontánea que produce electricidad; ánodo negativo.
+
+Q: Oxidación de alcoholes
+A: Con K₂Cr₂O₇ acidificado (naranja → verde).
+A: Primario → aldehído (destilando) → ácido carboxílico (a reflujo). Secundario → cetona. Terciario: no reacciona.
+
+Q: Reducción de grupos funcionales
+A: Ácido carboxílico, aldehído o cetona → alcohol con NaBH₄ o LiAlH₄.
+A: Alqueno + H₂ con catalizador de Ni → alcano.
+
+Q: Fisión heterolítica
+A: Ambos electrones del enlace se van a un solo átomo → se forman iones (un catión y un anión).
+
+Q: Sustitución nucleofílica básica
+A: Halogenoalcano + OH⁻ → alcohol + ion haluro. Ej.: $\text{CH}_3\text{Br} + \text{OH}^- \rightarrow \text{CH}_3\text{OH} + \text{Br}^-$
+
+Q: Adición electrofílica de Br₂ a un alqueno
+A: El enlace π del alqueno ataca al Br₂ (polarizado); se forma un dibromoalcano. Es la base de la prueba con agua de bromo.
+
+H: pOH, $K_b$ y relaciones a 25 °C
+A: $\text{pH} + \text{pOH} = 14$
+A: $K_a \times K_b = K_w$ y $\text{p}K_a + \text{p}K_b = 14$ (par conjugado)
+
+H: pH de una solución de sal
+A: Ácido fuerte + base débil → sal ácida (NH₄Cl).
+A: Ácido débil + base fuerte → sal básica (CH₃COONa). Fuerte + fuerte → neutra.
+
+H: ¿Cómo elegir el indicador de una titulación?
+A: Uno cuyo rango de viraje ($\text{p}K_{\text{in}} \pm 1$) caiga en el salto vertical del punto de equivalencia.
+A: Fenolftaleína: ácido débil + base fuerte. Naranja de metilo: ácido fuerte + base débil.
+
+H: Electrólisis de NaCl acuoso
+A: Cátodo: se forma H₂ (el Na⁺ es muy difícil de reducir).
+A: Ánodo: Cl₂ si está concentrado; O₂ si está diluido.
+
+H: Electrodeposición (electroplating)
+A: El objeto a recubrir es el cátodo; el metal de recubrimiento es el ánodo; el electrolito contiene iones de ese metal.
+
+H: Estabilidad de los carbocationes
+A: Terciario > secundario > primario, porque los grupos alquilo donan densidad electrónica (efecto inductivo positivo).
+
+H: ¿Qué halogenoalcano reacciona más rápido?
+A: El de yodo: el enlace C–I es el más débil y se rompe más fácil. Orden: C–I > C–Br > C–Cl.
+
+H: Complejos y enlace coordinado
+A: Los ligandos donan pares de electrones al ion metálico central (enlace coordinado). Ej.: $[\text{Cu(H}_2\text{O)}_6]^{2+}$
+
+## F-A | F | Física A | Espacio, tiempo y movimiento
+Q: Distancia vs desplazamiento; rapidez vs velocidad
+A: Distancia y rapidez: escalares.
+A: Desplazamiento y velocidad: vectores (magnitud y dirección).
+
+Q: Gráfica v–t: ¿qué es la pendiente y qué es el área?
+A: Pendiente = aceleración. Área bajo la curva = desplazamiento.
+
+Q: ¿Cuándo puedes usar las ecuaciones suvat?
+A: Solo si la aceleración es constante.
+
+Q: Proyectiles: idea clave (sin aire)
+A: Horizontal: velocidad constante. Vertical: aceleración $g$ hacia abajo.
+A: Se analizan por separado; el tiempo las conecta.
+
+Q: Efecto de la resistencia del aire en un proyectil
+A: Menor alcance y altura máxima; trayectoria asimétrica (baja más empinado).
+
+Q: Las tres leyes de Newton
+A: 1: sin fuerza neta, velocidad constante.
+A: 2: $F = \dfrac{\Delta p}{\Delta t} = ma$
+A: 3: fuerzas iguales y opuestas, sobre cuerpos distintos y del mismo tipo.
+
+Q: ¿El peso y la normal son un par de la 3.ª ley?
+A: No. Actúan sobre el mismo cuerpo y son de distinto tipo. El par del peso es la atracción del objeto sobre la Tierra.
+
+Q: Impulso
+A: $J = F\Delta t = \Delta p$. Es el área bajo la gráfica F–t.
+A: Airbag: más tiempo de choque → menor fuerza.
+
+Q: Conservación del momento: ¿cuándo aplica?
+A: En un sistema aislado (sin fuerza externa neta). En choques elásticos también se conserva la $E_k$; en inelásticos no.
+
+Q: Movimiento circular uniforme: ¿por qué hay aceleración?
+A: La dirección cambia. Aceleración centrípeta hacia el centro: $a = \dfrac{v^2}{r} = \omega^2 r$
+A: La fuerza centrípeta la da otra fuerza (tensión, gravedad, fricción).
+
+Q: Potencia y eficiencia
+A: $P = \dfrac{W}{t} = Fv$
+A: $\eta = \dfrac{\text{energía útil}}{\text{energía total}}$
+
+Q: Energía con fricción
+A: La energía total se conserva, pero parte se transfiere como energía térmica por el trabajo contra la fricción.
+
+H: Torque y equilibrio rotacional
+A: $\tau = Fr\sin\theta$
+A: Equilibrio: fuerza neta cero y torque neto cero.
+
+H: Momento de inercia
+A: Resistencia a cambiar el estado de rotación. Depende de la masa y de cómo se distribuye respecto al eje: $I = \sum mr^2$
+
+H: Conservación del momento angular
+A: $L = I\omega$ se conserva si no hay torque externo.
+A: Patinadora: brazos adentro → $I$ baja → $\omega$ sube.
+
+H: Postulados de la relatividad especial
+A: 1. Las leyes de la física son iguales en todos los sistemas inerciales.
+A: 2. La velocidad de la luz en el vacío es igual para todos los observadores.
+
+H: Dilatación del tiempo y tiempo propio
+A: Tiempo propio $\Delta t_0$: medido por quien ve ambos eventos en el mismo lugar. Los demás miden más: $\Delta t = \gamma\Delta t_0$
+
+H: Contracción de la longitud
+A: Longitud propia $L_0$: medida en reposo respecto al objeto. En movimiento se mide menor: $L = \dfrac{L_0}{\gamma}$
+
+H: Muones: evidencia de la relatividad
+A: Se crean en la alta atmósfera y viven muy poco, pero llegan a la superficie por la dilatación del tiempo (o la contracción de la distancia en su sistema).
+
+Q: Ecuaciones suvat
+A: $v = u + at$
+A: $s = ut + \tfrac{1}{2}at^2$
+A: $v^2 = u^2 + 2as$
+A: $s = \dfrac{(u + v)t}{2}$
+
+Q: Gráficas s–t y a–t
+A: Pendiente de s–t = velocidad. Área bajo a–t = cambio de velocidad.
+
+Q: Velocidad terminal
+A: Cuando la resistencia del aire iguala al peso: fuerza neta cero, aceleración cero, velocidad constante.
+
+Q: Fricción estática y dinámica
+A: Estática: $F_f \leq \mu_s F_N$. Dinámica: $F_f = \mu_d F_N$. Normalmente $\mu_s > \mu_d$.
+
+Q: Ley de Hooke y energía elástica
+A: $F_H = -kx$
+A: $E_H = \tfrac{1}{2}kx^2$ (área bajo la gráfica F–x)
+
+Q: Empuje (flotación) y arrastre viscoso
+A: Empuje: $F_b = \rho V g$ (peso del fluido desplazado).
+A: Ley de Stokes: $F_d = 6\pi\eta r v$ (esfera pequeña, flujo laminar).
+
+Q: Trabajo, energía cinética y potencial gravitatoria
+A: $W = Fs\cos\theta$
+A: $E_k = \tfrac{1}{2}mv^2 = \dfrac{p^2}{2m}$ y $\Delta E_p = mg\Delta h$
+
+Q: Explosiones y momento
+A: Si todo empieza en reposo, el momento total es cero: los fragmentos salen con momentos iguales y opuestos. La $E_k$ aumenta (viene de energía química).
+
+Q: Velocidad angular y lineal
+A: $\omega = \dfrac{2\pi}{T} = 2\pi f$ y $v = \omega r$
+
+Q: Diagramas de cuerpo libre
+A: Solo fuerzas que actúan SOBRE el objeto, dibujadas desde su centro, con longitudes proporcionales. Nada de «fuerza centrípeta» como fuerza extra.
+
+H: Segunda ley para rotación y energía cinética rotacional
+A: $\tau = I\alpha$
+A: $E_k = \tfrac{1}{2}I\omega^2$
+
+H: Ecuaciones de cinemática rotacional
+A: Iguales a suvat cambiando $s \to \theta$, $u \to \omega_i$, $v \to \omega_f$, $a \to \alpha$. Ej.: $\omega_f = \omega_i + \alpha t$
+
+H: Transformación de Galileo
+A: $x' = x - vt$, $t' = t$ y $u' = u - v$. Falla a velocidades cercanas a $c$.
+
+H: Factor de Lorentz
+A: $\gamma = \dfrac{1}{\sqrt{1 - \dfrac{v^2}{c^2}}}$. Siempre $\geq 1$; crece mucho cerca de $c$.
+
+H: Transformaciones de Lorentz
+A: $x' = \gamma(x - vt)$
+A: $t' = \gamma\left(t - \dfrac{vx}{c^2}\right)$
+
+H: Suma relativista de velocidades
+A: $u' = \dfrac{u - v}{1 - \dfrac{uv}{c^2}}$. Nada supera $c$.
+
+H: Relatividad de la simultaneidad
+A: Dos eventos simultáneos en un sistema, si ocurren en lugares distintos, no son simultáneos en otro sistema en movimiento.
+
+H: Diagramas espacio-tiempo
+A: Eje vertical $ct$, horizontal $x$. La línea de universo de la luz va a 45°.
+A: Un sistema con velocidad $v$ tiene ejes inclinados un ángulo $\theta$ con $\tan\theta = \dfrac{v}{c}$.
+
+H: Intervalo espacio-tiempo invariante
+A: $(ct)^2 - x^2 = (ct')^2 - x'^2$: todos los observadores inerciales miden lo mismo.
+
+## F-B | F | Física B | Térmica, gases, termodinámica y circuitos
+Q: Calor específico vs calor latente
+A: $c$: energía para subir 1 K a 1 kg → $Q = mc\Delta T$
+A: $L$: energía para cambiar de estado 1 kg sin cambiar T → $Q = mL$
+
+Q: ¿Por qué T no cambia durante un cambio de estado?
+A: La energía se usa para vencer fuerzas entre partículas (aumenta la $E_p$), no la energía cinética.
+
+Q: Tres formas de transferencia térmica
+A: Conducción: colisiones y electrones libres. Convección: movimiento de un fluido por diferencia de densidad. Radiación: ondas EM, no necesita medio.
+
+Q: Ley de Stefan–Boltzmann
+A: $P = e\sigma AT^4$. La potencia radiada depende muchísimo de $T$ (a la cuarta).
+
+Q: Ley de desplazamiento de Wien
+A: $\lambda_{\max}T = 2.9 \times 10^{-3}\ \text{m K}$
+A: Cuerpos más calientes tienen el pico en longitudes de onda más cortas. Sirve para la temperatura de estrellas.
+
+Q: Albedo
+A: $\alpha = \dfrac{\text{potencia reflejada}}{\text{potencia incidente}}$. Hielo alto, océano bajo.
+A: Menos hielo → menor albedo → más calentamiento.
+
+Q: Efecto invernadero: mecanismo
+A: La Tierra emite IR. CO₂, CH₄, H₂O y N₂O absorben IR (sus moléculas vibran) y lo reemiten en todas direcciones, parte hacia la superficie.
+
+Q: Presión de un gas a nivel molecular
+A: Las partículas chocan con las paredes; cada choque cambia su momento. Esa fuerza por unidad de área es la presión.
+
+Q: Temperatura y energía cinética media (teoría cinética)
+A: $\bar{E}_k = \tfrac{3}{2}k_B T$
+A: Energía interna = $E_k$ + $E_p$ de todas las partículas.
+
+Q: Ley de Ohm y resistividad
+A: $V = IR$ (conductor óhmico a T constante)
+A: $R = \dfrac{\rho L}{A}$
+
+Q: Resistencias en serie vs paralelo
+A: Serie: misma $I$; $R_T = R_1 + R_2 + \dots$
+A: Paralelo: mismo $V$; $\dfrac{1}{R_T} = \dfrac{1}{R_1} + \dfrac{1}{R_2} + \dots$
+
+Q: FEM y resistencia interna
+A: $\varepsilon = I(R + r)$
+A: Voltaje en terminales $V = \varepsilon - Ir$: baja cuando pasa más corriente.
+
+Q: Potencia eléctrica
+A: $P = VI = I^2R = \dfrac{V^2}{R}$
+
+Q: Amperímetro y voltímetro ideales
+A: Amperímetro: en serie, resistencia cero. Voltímetro: en paralelo, resistencia infinita.
+
+H: Primera ley de la termodinámica
+A: $Q = \Delta U + W$, donde $W$ es el trabajo hecho POR el gas. Ojo con los signos.
+
+H: Procesos termodinámicos
+A: Isobárico: $P$ constante, $W = P\Delta V$. Isocórico: $V$ constante, $W = 0$.
+A: Isotérmico: $T$ constante, $\Delta U = 0$. Adiabático: $Q = 0$.
+
+H: Segunda ley y entropía
+A: La entropía total de un sistema aislado nunca disminuye. Ninguna máquina térmica convierte todo el calor en trabajo.
+
+H: Eficiencia de Carnot
+A: $\eta_{\text{Carnot}} = 1 - \dfrac{T_c}{T_h}$ (en K). Máximo teórico de una máquina térmica.
+
+H: Diagrama P–V: ¿qué representa el área?
+A: El trabajo hecho. En un ciclo, el área encerrada es el trabajo neto.
+
+Q: Temperatura, calor y energía interna: diferencia
+A: Temperatura: mide la $E_k$ media de las partículas. Energía interna: energía total de las partículas. Calor: energía transferida por diferencia de temperatura.
+
+Q: Conducción térmica: ecuación
+A: $\dfrac{\Delta Q}{\Delta t} = kA\dfrac{\Delta T}{\Delta x}$
+A: Más área, más diferencia de temperatura y menor grosor → más flujo de calor.
+
+Q: Cuerpo negro y emisividad
+A: Cuerpo negro: absorbe toda la radiación y emite lo máximo posible a su temperatura.
+A: $e = \dfrac{\text{potencia emitida}}{\text{potencia de un cuerpo negro a la misma } T}$, entre 0 y 1.
+
+Q: Constante solar
+A: Intensidad del Sol fuera de la atmósfera, ~1360 W m⁻².
+A: El promedio sobre la Tierra es $\dfrac{S}{4}$: se recibe en un disco pero se reparte en una esfera.
+
+Q: Intensidad de la radiación
+A: $I = \dfrac{P}{A}$. Desde una fuente puntual: $I = \dfrac{P}{4\pi d^2}$ (inverso del cuadrado).
+
+Q: Leyes de los gases
+A: Boyle: $PV$ constante (T fija). Charles: $\dfrac{V}{T}$ constante (P fija). Gay-Lussac: $\dfrac{P}{T}$ constante (V fijo).
+
+Q: Ecuación de los gases con número de partículas
+A: $PV = Nk_BT$, con $k_B = \dfrac{R}{N_A}$
+A: Presión y rapidez de las partículas: $P = \tfrac{1}{3}\rho\overline{v^2}$
+
+Q: Corriente y diferencia de potencial
+A: $I = \dfrac{\Delta q}{\Delta t}$ (A = C s⁻¹)
+A: $V = \dfrac{W}{q}$ (V = J C⁻¹)
+
+Q: Leyes de Kirchhoff
+A: Nodos: la corriente que entra = la que sale (conservación de la carga).
+A: Mallas: la suma de FEM = suma de caídas de potencial (conservación de la energía).
+
+Q: Divisor de voltaje
+A: $V_{\text{out}} = \dfrac{R_2}{R_1 + R_2}V_{\text{in}}$
+
+Q: LDR y termistor
+A: LDR: más luz → menor resistencia. Termistor NTC: más temperatura → menor resistencia. Se usan en divisores de voltaje como sensores.
+
+Q: Curvas I–V
+A: Conductor óhmico: recta por el origen. Lámpara de filamento: curva que se aplana (la R aumenta al calentarse).
+
+H: Entropía: dos definiciones
+A: Macroscópica: $\Delta S = \dfrac{\Delta Q}{T}$
+A: Microscópica: $S = k_B \ln \Omega$, donde $\Omega$ es el número de microestados.
+
+H: Energía interna de un gas ideal monoatómico
+A: $U = \tfrac{3}{2}Nk_BT = \tfrac{3}{2}nRT$
+
+H: Proceso adiabático de un gas monoatómico
+A: $PV^{5/3} = \text{constante}$. Una compresión adiabática calienta el gas.
+
+H: Eficiencia de una máquina térmica
+A: $\eta = \dfrac{W}{Q_h} = \dfrac{Q_h - Q_c}{Q_h}$
+
+H: Etapas del ciclo de Carnot
+A: Expansión isotérmica → expansión adiabática → compresión isotérmica → compresión adiabática.
+
+## F-C | F | Física C | Oscilaciones y ondas
+Q: Condición de movimiento armónico simple
+A: Aceleración proporcional al desplazamiento y en sentido opuesto: $a = -\omega^2 x$
+
+Q: En un MAS, ¿dónde son máximas la velocidad y la aceleración?
+A: Velocidad máxima en el equilibrio. Aceleración máxima en los extremos.
+
+Q: Energía en un MAS
+A: $E_k$ máxima en el equilibrio, $E_p$ máxima en los extremos. La energía total se mantiene (sin amortiguamiento).
+
+Q: Ondas transversales vs longitudinales
+A: Transversal: oscila perpendicular a la propagación (luz, cuerda).
+A: Longitudinal: oscila paralela (sonido), con compresiones y rarefacciones.
+
+Q: Ecuación de onda: ¿qué cambia al pasar a otro medio?
+A: $v = f\lambda$. Cambian $v$ y $\lambda$; la frecuencia se mantiene (la fija la fuente).
+
+Q: Ley de Snell y reflexión total interna
+A: $n_1\sin\theta_1 = n_2\sin\theta_2$
+A: RTI: de un medio más denso a uno menos denso, con ángulo mayor que el crítico. Ej.: fibra óptica.
+
+Q: Interferencia constructiva y destructiva
+A: Constructiva: diferencia de camino $= n\lambda$. Destructiva: $= \left(n + \tfrac{1}{2}\right)\lambda$. Requiere fuentes coherentes.
+
+Q: ¿Cuándo se nota la difracción?
+A: Cuando la abertura u obstáculo es de tamaño comparable a la longitud de onda.
+
+Q: Doble rendija
+A: Franjas igualmente espaciadas: $s = \dfrac{\lambda D}{d}$
+A: Más $D$ o más $\lambda$ → franjas más separadas.
+
+Q: Ondas estacionarias
+A: Superposición de dos ondas iguales en sentidos opuestos. Tienen nodos y antinodos y no transportan energía neta.
+
+Q: Tubo cerrado en un extremo
+A: Nodo en el extremo cerrado, antinodo en el abierto. Solo armónicos impares; fundamental: $L = \dfrac{\lambda}{4}$
+
+Q: Resonancia y amortiguamiento
+A: Resonancia: frecuencia impulsora = frecuencia natural → amplitud máxima.
+A: El amortiguamiento baja la amplitud y ensancha el pico.
+
+Q: Efecto Doppler
+A: Fuente que se acerca: frecuencia observada mayor. Que se aleja: menor.
+A: Para luz: $\dfrac{\Delta\lambda}{\lambda} \approx \dfrac{v}{c}$. Corrimiento al rojo de galaxias.
+
+H: Ecuaciones del MAS
+A: $x = x_0\sin(\omega t)$ y $v = \omega x_0\cos(\omega t)$
+A: $v = \pm\omega\sqrt{x_0^2 - x^2}$
+
+H: Rejilla de difracción
+A: $n\lambda = d\sin\theta$. Máximos mucho más nítidos y brillantes que en la doble rendija.
+
+H: Difracción por una sola rendija
+A: Máximo central con el doble de ancho que los demás. Primer mínimo en $\theta = \dfrac{\lambda}{b}$
+
+H: Doppler en sonido: ecuaciones
+A: Fuente en movimiento: $f' = f\dfrac{v}{v \mp u_s}$
+A: Observador en movimiento: $f' = f\dfrac{v \pm u_o}{v}$ (signo de arriba = acercándose)
+
+Q: Periodo del péndulo y del resorte
+A: Péndulo: $T = 2\pi\sqrt{\dfrac{l}{g}}$
+A: Masa–resorte: $T = 2\pi\sqrt{\dfrac{m}{k}}$
+
+Q: Periodo, frecuencia y frecuencia angular
+A: $T = \dfrac{1}{f}$ y $\omega = 2\pi f = \dfrac{2\pi}{T}$
+
+Q: Fases en las gráficas del MAS
+A: La velocidad va adelantada $\dfrac{\pi}{2}$ respecto al desplazamiento; la aceleración está en antifase ($\pi$) con el desplazamiento.
+
+Q: Espectro electromagnético en orden
+A: Radio, microondas, infrarrojo, visible, ultravioleta, rayos X, gamma (de mayor a menor $\lambda$). Todas viajan a $c$ en el vacío.
+
+Q: Sonido
+A: Onda longitudinal que necesita un medio; más rápida en sólidos que en gases. No existe en el vacío.
+
+Q: Frentes de onda y rayos
+A: Frente de onda: puntos en la misma fase. El rayo indica la dirección de propagación y es perpendicular a los frentes.
+
+Q: Índice de refracción y ángulo crítico
+A: $n = \dfrac{c}{v}$
+A: $\sin\theta_c = \dfrac{n_2}{n_1}$ (con $n_1 > n_2$)
+
+Q: Principio de superposición
+A: Cuando dos ondas coinciden, el desplazamiento resultante es la suma de los desplazamientos individuales.
+
+Q: Diferencia de camino y de fase
+A: $\Delta\phi = \dfrac{2\pi\,\Delta x}{\lambda}$. Una diferencia de camino de $\lambda$ equivale a $2\pi$.
+
+Q: Cuerda fija en ambos extremos y tubo abierto en ambos extremos
+A: Todos los armónicos: $L = \dfrac{n\lambda}{2}$, con $n = 1, 2, 3, \dots$
+A: Distancia entre nodos consecutivos: $\dfrac{\lambda}{2}$
+
+Q: Tipos de amortiguamiento
+A: Ligero: oscila perdiendo amplitud poco a poco. Crítico: vuelve al equilibrio lo más rápido posible sin oscilar. Fuerte: vuelve muy lento sin oscilar.
+
+H: Energía en el MAS: ecuaciones
+A: $E_k = \tfrac{1}{2}m\omega^2(x_0^2 - x^2)$
+A: $E_T = \tfrac{1}{2}m\omega^2 x_0^2$
+
+H: Efecto de la rendija única sobre el patrón de doble rendija
+A: El patrón de franjas queda modulado por la envolvente de difracción de una rendija: las franjas brillantes pierden intensidad hacia los lados.
+
+H: ¿Qué pasa al aumentar el número de rendijas?
+A: Los máximos principales se vuelven más angostos y brillantes, con la misma posición.
+
+## F-D | F | Física D | Campos gravitatorios, eléctricos y magnéticos
+Q: Ley de gravitación universal
+A: $F = \dfrac{GMm}{r^2}$. Siempre atractiva; inverso del cuadrado.
+
+Q: Intensidad del campo gravitatorio
+A: $g = \dfrac{F}{m} = \dfrac{GM}{r^2}$ (N kg⁻¹). Fuerza por unidad de masa.
+
+Q: 3.ª ley de Kepler
+A: $T^2 \propto r^3$ para cuerpos que orbitan el mismo cuerpo central.
+
+Q: Ley de Coulomb
+A: $F = \dfrac{kq_1q_2}{r^2}$. Cargas iguales se repelen; opuestas se atraen.
+
+Q: Líneas de campo eléctrico
+A: Van de + a −, llegan perpendiculares a un conductor; más juntas = campo más intenso.
+A: Entre placas paralelas el campo es uniforme: $E = \dfrac{V}{d}$
+
+Q: Fuerza magnética sobre una carga en movimiento
+A: $F = qvB\sin\theta$, perpendicular a $v$ y a $B$. No hace trabajo: cambia la dirección, no la rapidez.
+
+Q: Carga en campo magnético uniforme perpendicular
+A: Movimiento circular con $r = \dfrac{mv}{qB}$
+
+Q: Carga en campo eléctrico uniforme
+A: Fuerza constante $qE$ → trayectoria parabólica, como un proyectil.
+
+Q: Fuerza sobre un conductor con corriente
+A: $F = BIL\sin\theta$
+
+H: Potencial gravitatorio
+A: $V_g = -\dfrac{GM}{r}$. Trabajo por unidad de masa para traer una masa desde el infinito. Siempre negativo.
+
+H: Velocidad de escape
+A: $v_{\text{esc}} = \sqrt{\dfrac{2GM}{r}}$. Sale de igualar la $E_k$ con la energía necesaria para llegar al infinito.
+
+H: Energía de un satélite en órbita
+A: $E_k = \dfrac{GMm}{2r}$, $E_p = -\dfrac{GMm}{r}$, $E_T = -\dfrac{GMm}{2r}$
+A: Si pierde energía por fricción, baja de órbita y va más rápido.
+
+H: Equipotenciales
+A: Superficies de igual potencial, perpendiculares a las líneas de campo. Moverse sobre ellas no requiere trabajo.
+
+H: Flujo magnético
+A: $\Phi = BA\cos\theta$ (Wb)
+
+H: Ley de Faraday y ley de Lenz
+A: $\varepsilon = -N\dfrac{\Delta\Phi}{\Delta t}$
+A: Lenz: la corriente inducida se opone al cambio que la produce (conservación de la energía).
+
+H: Generador de corriente alterna
+A: Una bobina que gira en un campo magnético produce una fem sinusoidal. Girar más rápido aumenta la amplitud y la frecuencia.
+
+Q: Campo gravitatorio: forma de las líneas
+A: Radiales hacia el centro de una masa puntual o esférica. Cerca de la superficie terrestre: casi paralelas (campo uniforme).
+
+Q: Leyes 1.ª y 2.ª de Kepler
+A: 1: las órbitas son elipses con el Sol en un foco.
+A: 2: la línea planeta–Sol barre áreas iguales en tiempos iguales (va más rápido cerca del Sol).
+
+Q: Rapidez orbital
+A: De $\dfrac{GMm}{r^2} = \dfrac{mv^2}{r}$ sale $v = \sqrt{\dfrac{GM}{r}}$. Órbitas más bajas son más rápidas.
+
+Q: Intensidad del campo eléctrico
+A: $E = \dfrac{F}{q}$ y para una carga puntual $E = \dfrac{kQ}{r^2}$, con $k = \dfrac{1}{4\pi\varepsilon_0}$
+
+Q: Experimento de Millikan
+A: Gotas de aceite cargadas se equilibran entre placas: $qE = mg$. Mostró que la carga está cuantizada en múltiplos de $e = 1.6 \times 10^{-19}$ C.
+
+Q: Electrización y conservación de la carga
+A: Por fricción se transfieren electrones; por inducción se redistribuyen cargas sin contacto. La carga total se conserva.
+
+Q: Campo magnético de un alambre recto y de un solenoide
+A: Alambre: círculos concéntricos (regla de la mano derecha).
+A: Solenoide: campo uniforme adentro, como un imán de barra afuera.
+
+Q: Campo magnético de un alambre largo
+A: $B = \dfrac{\mu_0 I}{2\pi r}$
+
+Q: Fuerza entre dos alambres paralelos
+A: Corrientes en el mismo sentido se atraen; opuestas se repelen.
+A: $\dfrac{F}{L} = \dfrac{\mu_0 I_1 I_2}{2\pi r}$
+
+Q: Selector de velocidades
+A: Campos E y B perpendiculares: las partículas con $v = \dfrac{E}{B}$ pasan sin desviarse ($qE = qvB$).
+
+Q: Aceleración de una carga por una diferencia de potencial
+A: $qV = \tfrac{1}{2}mv^2$. Unidad: 1 eV = energía que gana un electrón en 1 V.
+
+H: Potencial eléctrico y energía potencial eléctrica
+A: $V_e = \dfrac{kQ}{r}$ y $E_p = \dfrac{kQq}{r}$
+
+H: Campo y gradiente de potencial
+A: $E = -\dfrac{\Delta V_e}{\Delta r}$ y $g = -\dfrac{\Delta V_g}{\Delta r}$. El campo apunta hacia donde baja el potencial.
+
+H: FEM de movimiento
+A: Una barra de longitud $L$ que se mueve con rapidez $v$ en un campo $B$: $\varepsilon = BvL$
+
+H: Enlace de flujo
+A: $N\Phi$: flujo por el número de espiras. La fem inducida depende de su ritmo de cambio.
+
+H: Imán entrando en una bobina (Lenz)
+A: La bobina genera un polo igual al que se acerca para repelerlo. Hay que hacer trabajo para meter el imán: esa es la energía eléctrica.
+
+## F-E | F | Física E | Nuclear, cuántica y estrellas
+Q: Experimento de Geiger–Marsden (Rutherford): conclusiones
+A: La mayoría de partículas α pasa: el átomo es casi vacío.
+A: Unas pocas rebotan mucho: núcleo pequeño, denso y positivo.
+
+Q: Espectros de emisión y absorción
+A: Emisión: líneas brillantes cuando el electrón baja de nivel.
+A: Absorción: líneas oscuras sobre un espectro continuo, en las mismas frecuencias. $E = hf$
+
+Q: Decaimientos α, β⁻, β⁺ y γ
+A: α: núcleo de He ($A - 4$, $Z - 2$), muy ionizante, poco penetrante.
+A: β⁻: $n \rightarrow p + e^- + \bar{\nu}_e$ · β⁺: $p \rightarrow n + e^+ + \nu_e$
+A: γ: fotón, no cambia $A$ ni $Z$.
+
+Q: ¿Por qué se postuló el neutrino?
+A: La energía de las partículas β tiene un espectro continuo; hacía falta otra partícula para conservar la energía.
+
+Q: Vida media
+A: Tiempo para que la mitad de los núcleos (o la actividad) decaiga. El decaimiento es aleatorio y espontáneo.
+
+Q: Defecto de masa y energía de enlace
+A: La masa del núcleo es menor que la suma de sus nucleones. Esa diferencia, con $E = \Delta m c^2$, es la energía de enlace.
+
+Q: Curva de energía de enlace por nucleón
+A: Máximo cerca del Fe-56 (más estable). Fusionar núcleos ligeros y fisionar pesados libera energía.
+
+Q: Reactor de fisión: moderador, barras de control y refrigerante
+A: Moderador: frena neutrones (grafito, agua). Barras de control: absorben neutrones para controlar la cadena. Refrigerante: extrae el calor.
+
+Q: Estabilidad de una estrella
+A: La presión de radiación y térmica hacia afuera equilibra la gravedad hacia adentro.
+
+Q: Diagrama HR
+A: Luminosidad vs temperatura (T disminuye hacia la derecha). Secuencia principal, gigantes rojas, enanas blancas.
+
+Q: Evolución estelar según la masa
+A: Baja masa: gigante roja → nebulosa planetaria → enana blanca.
+A: Alta masa: supergigante → supernova → estrella de neutrones o agujero negro.
+
+Q: Paralaje estelar
+A: $d\,(\text{pc}) = \dfrac{1}{p\,(\text{arcsec})}$. Solo sirve para estrellas cercanas.
+
+H: Efecto fotoeléctrico: evidencia de fotones
+A: Hay frecuencia umbral; la emisión es instantánea; la $E_k$ máxima depende de $f$, no de la intensidad.
+A: $hf = \Phi + E_{k,\max}$
+
+H: Dualidad onda-partícula
+A: Los electrones difractan: tienen longitud de onda de De Broglie $\lambda = \dfrac{h}{p}$
+
+H: Dispersión de Compton
+A: Fotones de rayos X chocan con electrones y salen con mayor $\lambda$. Demuestra que el fotón tiene momento.
+A: $\Delta\lambda = \dfrac{h}{m_e c}(1 - \cos\theta)$
+
+H: Radio nuclear
+A: $R = R_0 A^{1/3}$. La densidad nuclear es aproximadamente constante.
+
+H: Ley de decaimiento radiactivo
+A: $N = N_0e^{-\lambda t}$, con $\lambda = \dfrac{\ln 2}{T_{1/2}}$
+A: Actividad: $A = \lambda N$
+
+Q: Fuerza nuclear fuerte
+A: Atrae nucleones entre sí, es de muy corto alcance (~fm) y repulsiva a distancias aún menores. Vence la repulsión eléctrica entre protones.
+
+Q: Energía del fotón y el electronvoltio
+A: $E = hf = \dfrac{hc}{\lambda}$
+A: $1\ \text{eV} = 1.6 \times 10^{-19}\ \text{J}$
+
+Q: Equivalencia masa–energía
+A: $E = mc^2$. En física nuclear: $1\ \text{u} = 931.5\ \text{MeV}\,c^{-2}$
+
+Q: Estabilidad nuclear y relación N/Z
+A: Los núcleos pesados necesitan más neutrones que protones. Con exceso de neutrones decaen por β⁻; con exceso de protones, por β⁺.
+
+Q: Radiación de fondo
+A: Radiación presente siempre: rocas y suelo (radón), rayos cósmicos, alimentos y fuentes médicas. Se resta a las mediciones.
+
+Q: Fisión del uranio-235
+A: Absorbe un neutrón térmico, se divide en dos núcleos medianos y libera 2–3 neutrones y energía. Si hay masa crítica, hay reacción en cadena.
+
+Q: Residuos nucleares
+A: Productos de fisión radiactivos de vida media larga; requieren almacenamiento seguro por miles de años. Es el gran problema de la energía nuclear.
+
+Q: Fusión en estrellas
+A: Requiere temperatura y presión altísimas para vencer la repulsión eléctrica. En estrellas como el Sol: cadena protón–protón, H → He.
+
+Q: Luminosidad y brillo aparente
+A: $L = \sigma AT^4$
+A: $b = \dfrac{L}{4\pi d^2}$
+
+Q: Espectros estelares
+A: Las líneas de absorción identifican los elementos de la atmósfera de la estrella; el pico (Wien) da la temperatura.
+
+Q: Límite de Chandrasekhar
+A: Una enana blanca no puede superar ~1.4 masas solares; por encima colapsa (estrella de neutrones o agujero negro).
+
+H: Modelo de Bohr del hidrógeno
+A: $E = -\dfrac{13.6}{n^2}\ \text{eV}$
+A: Momento angular cuantizado: $mvr = \dfrac{nh}{2\pi}$
+
+H: Potencial de frenado
+A: $eV_s = E_{k,\max}$. Graficando $V_s$ vs $f$: pendiente $h/e$, corte con el eje da la frecuencia umbral.
+
+H: Distancia de máximo acercamiento
+A: Una partícula α lanzada de frente contra un núcleo: $E_k = \dfrac{kQq}{d}$. Da un límite superior del radio nuclear.
+
+## DS-CON | D | DS · Conceptos | Los 7 conceptos y cómo usar ejemplos
+Q: Nombra los 7 conceptos de Digital Society
+A: Change, expression, identity, power, space, systems, values & ethics.
+
+Q: Nombra los 7 contextos
+A: Cultural, económico, ambiental, salud, conocimiento humano, político, social.
+
+Q: ¿Qué tiene un buen ejemplo en DS?
+A: Es real y específico (quién, dónde, cuándo), se conecta con un concepto, un contenido y un contexto, y muestra impactos en personas.
+
+Q: Concepto: power
+A: Quién controla la tecnología, los datos y las decisiones; relaciones de influencia entre personas, empresas y gobiernos.
+
+Q: Concepto: identity
+A: Cómo lo digital moldea quiénes somos y cómo nos presentamos (perfiles, avatares, identidad digital).
+
+Q: Concepto: space
+A: Cómo lo digital cambia el sentido de lugar y distancia; espacios físicos y virtuales y acceso desigual a ellos.
+
+Q: Concepto: systems
+A: Partes que interactúan; un cambio en una parte afecta al conjunto.
+
+Q: Concepto: values & ethics
+A: Qué se considera correcto; dilemas de privacidad, justicia y responsabilidad.
+
+Q: Concepto: change
+A: Transformaciones que causa lo digital en personas y sociedades: pueden ser graduales o disruptivas, esperadas o no, con ganadores y perdedores.
+
+Q: Concepto: expression
+A: Cómo personas y grupos comunican, crean y comparten usando medios digitales (arte, memes, activismo, redes).
+
+Q: Interseccionalidad e identidad
+A: Una persona tiene varias identidades a la vez (género, etnia, clase, edad); lo digital puede afectarlas combinadas, no por separado.
+
+Q: Analógico vs digital
+A: Analógico: señal continua. Digital: valores discretos (binario). Digitalizar = muestrear y cuantizar una señal analógica.
+
+## DS-DATA | D | DS · Data | Datos, privacidad y big data
+Q: Dato vs información
+A: Datos: hechos crudos sin contexto.
+A: Información: datos procesados y organizados que tienen significado.
+
+Q: Datos cualitativos vs cuantitativos
+A: Cualitativos: descripciones o categorías. Cuantitativos: números medibles (discretos o continuos).
+
+Q: Metadatos
+A: Datos sobre los datos: fecha, ubicación, autor, dispositivo. Los metadatos de una foto pueden revelar dónde se tomó (privacidad).
+
+Q: Características del big data
+A: Volumen, velocidad y variedad (a veces también veracidad y valor).
+
+Q: Huella digital
+A: El rastro de datos que dejas en línea. Activa: lo que publicas. Pasiva: lo que se recoge sin que lo notes (cookies, ubicación).
+
+Q: Ejemplo: Cambridge Analytica
+A: Datos de millones de usuarios de Facebook, obtenidos a través de una app de test, se usaron para perfiles políticos (revelado en 2018).
+A: Conceptos: power, values & ethics. Contexto: político.
+
+Q: Ejemplo: GDPR
+A: Reglamento de protección de datos de la Unión Europea, aplica desde 2018: consentimiento, derecho a acceder y borrar tus datos, multas altas.
+A: Conceptos: power, values. Contexto: político.
+
+Q: Datos abiertos (open data)
+A: Datos que cualquiera puede usar y compartir, como estadísticas del gobierno. A favor: transparencia. En contra: riesgo de reidentificación.
+
+Q: Anonimización y su límite
+A: Quitar identificadores directos. Pero combinando varios datasets se puede volver a identificar a las personas.
+
+Q: Problemas de calidad de datos
+A: Incompletos, desactualizados, con errores de entrada o sesgados (muestra no representativa).
+
+Q: Pirámide DIKW
+A: Datos → información → conocimiento → sabiduría. Cada nivel agrega contexto, interpretación y juicio.
+
+Q: Ciclo de vida de los datos
+A: Recolección → almacenamiento → procesamiento → uso y compartición → archivo → eliminación. En cada etapa hay riesgos de privacidad y seguridad.
+
+Q: Métodos para recolectar datos
+A: Encuestas, sensores, transacciones, registros de uso (logs), scraping web, formularios. Cada uno puede introducir sesgos distintos.
+
+Q: Representar datos: riesgos
+A: Las visualizaciones pueden engañar: ejes truncados, escalas manipuladas, datos seleccionados a conveniencia.
+
+Q: Dilemas de datos
+A: Vigilancia vs seguridad, consentimiento real (nadie lee los términos), quién es dueño de los datos, venta a terceros.
+
+## DS-ALG | D | DS · Algorithms | Algoritmos, sesgo y transparencia
+Q: ¿Qué es un algoritmo?
+A: Secuencia finita de instrucciones precisas para resolver un problema o hacer una tarea.
+
+Q: Características de un buen algoritmo
+A: Preciso, finito, con entradas y salidas definidas, eficiente.
+
+Q: Sesgo algorítmico
+A: Resultados sistemáticamente injustos para ciertos grupos, por datos de entrenamiento sesgados o por decisiones de diseño.
+
+Q: Ejemplo: COMPAS
+A: Algoritmo usado en tribunales de EE. UU. para predecir reincidencia. ProPublica (2016) reportó más falsos positivos para acusados negros.
+A: Conceptos: power, values. Contexto: político/social.
+
+Q: Ejemplo: herramienta de contratación de Amazon
+A: Sistema para filtrar CVs que penalizaba a mujeres porque aprendió de un historial dominado por hombres. Se abandonó (reportado en 2018).
+A: Conceptos: identity, values. Contexto: económico.
+
+Q: Algoritmos de recomendación y burbujas de filtro
+A: Te muestran contenido parecido a lo que ya consumes. Pueden encerrarte en una burbuja y polarizar. Ej.: feeds de TikTok o YouTube.
+
+Q: Algoritmos de «caja negra»
+A: No se puede explicar cómo llegaron a una decisión. Es un problema de transparencia y de rendición de cuentas.
+
+Q: Rendición de cuentas (accountability)
+A: Quién responde cuando un algoritmo causa daño: quien lo diseña, la empresa que lo usa o el usuario.
+
+Q: Eficiencia algorítmica
+A: Cuánto tiempo y memoria necesita según el tamaño de la entrada. Ej.: búsqueda binaria es mucho más rápida que la lineal en listas ordenadas.
+
+Q: Pensamiento computacional
+A: Descomposición, reconocimiento de patrones, abstracción y diseño de algoritmos.
+
+Q: Componentes de un algoritmo
+A: Entradas, procesos, salidas. Estructuras: secuencia, selección (si… entonces) e iteración (repetir).
+
+Q: Cómo se representan los algoritmos
+A: Diagramas de flujo, pseudocódigo y código en un lenguaje de programación.
+
+Q: Usos de los algoritmos
+A: Búsqueda, ordenamiento, recomendación, predicción, clasificación, rutas (GPS), fijación dinámica de precios.
+
+Q: Ejemplo: escándalo de subsidios en Países Bajos
+A: Un sistema de riesgo del fisco marcó como fraude a miles de familias que recibían ayuda para guardería, con sesgo contra personas con doble nacionalidad. El gobierno renunció en 2021.
+A: Conceptos: power, values. Contexto: político.
+
+## DS-COMP | D | DS · Computers | Hardware, software y brecha digital
+Q: Componentes básicos de un computador
+A: Entrada, procesamiento (CPU), almacenamiento (memoria) y salida.
+
+Q: RAM vs almacenamiento secundario
+A: RAM: volátil y rápida, guarda lo que está en uso. SSD/HDD: no volátil, guarda de forma permanente.
+
+Q: Hardware, software y sistema operativo
+A: Hardware: lo físico. Software: los programas. El SO gestiona los recursos y conecta hardware con aplicaciones.
+
+Q: Sistema binario
+A: Todo se representa con 0 y 1 (bits). 8 bits = 1 byte.
+
+Q: Computación en la nube
+A: Servidores remotos para guardar y procesar por internet. A favor: acceso y escalabilidad. En contra: dependencia, privacidad y soberanía de datos.
+
+Q: Obsolescencia programada y basura electrónica
+A: Dispositivos que duran poco generan e-waste, a menudo enviado a países de menores ingresos.
+A: Concepto: values. Contexto: ambiental.
+
+Q: Brecha digital
+A: Desigualdad en acceso a tecnología e internet y en habilidades para usarla.
+A: Conceptos: power, space. Contexto: social/económico.
+
+Q: Ley de Moore
+A: Observación de que los transistores en un chip se duplicaban cada ~2 años. Hoy se está desacelerando.
+
+Q: Software abierto vs propietario
+A: Abierto: el código se puede ver y modificar (Linux). Propietario: código cerrado (Windows).
+
+Q: Malware y phishing
+A: Malware: software malicioso (virus, ransomware). Phishing: engaño que se hace pasar por alguien confiable para robar datos.
+
+Q: Tipos de computadores
+A: Supercomputadores, servidores, computadores personales, móviles y sistemas embebidos (dentro de autos, electrodomésticos).
+
+Q: Lenguajes de alto y bajo nivel
+A: Alto nivel: cercano al lenguaje humano (Python). Bajo nivel: cercano a la máquina (ensamblador). Compiladores e intérpretes traducen a código máquina.
+
+Q: Evolución de la computación
+A: Mainframes (años 50–60) → computadores personales (80) → internet y móviles (2000) → nube e IA.
+
+## DS-MED | D | DS · Media | Medios digitales y desinformación
+Q: Medios digitales
+A: Texto, imagen, audio, video o interactivos en formato digital: fáciles de copiar, editar y distribuir.
+
+Q: Ejemplo: deepfake de Zelensky (2022)
+A: Video falso generado con IA en el que parecía pedir a los ucranianos rendirse.
+A: Conceptos: expression, values. Contexto: político.
+
+Q: Desinformación vs misinformación
+A: Desinformación: falsa y difundida para engañar. Misinformación: falsa pero sin intención de engañar.
+
+Q: Periodismo ciudadano
+A: Personas comunes que documentan y difunden noticias con el celular. Más voces, pero menos verificación.
+
+Q: Compresión con pérdida vs sin pérdida
+A: Con pérdida (JPEG, MP3): elimina datos, archivos pequeños. Sin pérdida (PNG, ZIP): recupera el original exacto.
+
+Q: Copyright y Creative Commons
+A: El copyright protege las obras. Creative Commons permite al autor dar ciertos permisos (atribución, uso no comercial, etc.).
+
+Q: Economía de la atención
+A: Las plataformas compiten por tu tiempo con diseño persuasivo (scroll infinito, notificaciones).
+A: Concepto: power. Contextos: salud, económico.
+
+Q: Influencers y contenido patrocinado
+A: Publicidad que parece contenido personal. Preguntas de transparencia, confianza e identidad.
+
+Q: ¿Cómo verificar un contenido?
+A: Búsqueda inversa de imágenes, revisar la fuente y la fecha, comparar con otras coberturas (lectura lateral).
+
+Q: Representación en los medios
+A: Cómo se muestra o se excluye a ciertos grupos; influye en estereotipos e identidad.
+
+Q: Medios inmersivos: VR, AR y MR
+A: VR: entorno totalmente virtual. AR: capas digitales sobre el mundo real (filtros, Pokémon GO). MR: objetos virtuales que interactúan con el entorno real.
+
+Q: Moderación de contenido
+A: Las plataformas deciden qué se borra o se limita. Tensión entre libertad de expresión, seguridad y quién tiene el poder de decidir.
+
+## DS-NET | D | DS · Networks & internet | Redes, protocolos y control
+Q: Internet vs World Wide Web
+A: Internet: red global de redes (infraestructura). Web: páginas enlazadas que funcionan sobre internet usando HTTP.
+
+Q: LAN vs WAN
+A: LAN: red local (casa, colegio). WAN: área amplia; internet es la WAN más grande.
+
+Q: Dirección IP y DNS
+A: IP: identificador numérico de un dispositivo. DNS: traduce nombres de dominio a direcciones IP.
+
+Q: Protocolos
+A: Reglas para comunicar datos: TCP/IP, HTTP/HTTPS (la S indica cifrado).
+
+Q: Conmutación de paquetes
+A: Los datos se dividen en paquetes que viajan por rutas distintas y se reensamblan en el destino.
+
+Q: Neutralidad de la red
+A: Los proveedores deben tratar todo el tráfico igual, sin bloquear ni priorizar.
+A: Concepto: power. Contextos: político, económico.
+
+Q: Internet de las cosas (IoT)
+A: Objetos cotidianos conectados que recogen e intercambian datos (relojes, termostatos). Riesgos de seguridad y privacidad.
+
+Q: Cifrado de extremo a extremo
+A: Solo emisor y receptor pueden leer el mensaje (WhatsApp, Signal). Tensión entre privacidad y vigilancia estatal.
+
+Q: Deep web vs dark web
+A: Deep web: no indexada (correo, banca). Dark web: requiere software especial como Tor; anonimato para activistas y también para actividades ilegales.
+
+Q: Cortes de internet por gobiernos
+A: Apagones deliberados durante protestas o elecciones.
+A: Conceptos: power, space. Contexto: político.
+
+Q: Componentes de una red
+A: Router (dirige paquetes entre redes), switch (conecta dispositivos en una LAN), módem, servidores, tarjeta de red, cables o conexión inalámbrica.
+
+Q: Características de una red
+A: Ancho de banda (cuántos datos por segundo), latencia (retraso), fiabilidad y seguridad.
+
+Q: Proveedores de red
+A: ISP (dan acceso a internet), redes de distribución de contenido (CDN) y proveedores de nube.
+
+Q: Evolución de internet y la web
+A: ARPANET (1969) → web de Tim Berners-Lee (1989–1991) → web 2.0 con redes sociales y contenido de usuarios → móvil y nube.
+
+## DS-AI | D | DS · AI | Inteligencia artificial
+Q: IA estrecha vs IA general
+A: Estrecha: una tarea específica (reconocer caras, traducir). General: capacidad humana en cualquier tarea; aún no existe.
+
+Q: Machine learning
+A: Sistemas que aprenden patrones a partir de datos en vez de seguir reglas escritas a mano.
+
+Q: Aprendizaje supervisado vs no supervisado
+A: Supervisado: datos etiquetados (fotos marcadas «gato» o «perro»). No supervisado: encuentra grupos o patrones sin etiquetas.
+
+Q: Aprendizaje por refuerzo
+A: Un agente aprende por ensayo y error con recompensas y castigos. Ej.: AlphaGo.
+
+Q: Red neuronal
+A: Capas de nodos conectados con pesos que se ajustan al entrenar. Base del deep learning.
+
+Q: Test de Turing
+A: Una máquina lo «pasa» si una persona no la distingue de otra persona en una conversación. Crítica: imitar no es entender.
+
+Q: IA generativa
+A: Crea contenido nuevo (texto, imágenes, audio) a partir de patrones aprendidos. Problemas: errores inventados, derechos de autor, desinformación.
+
+Q: Reconocimiento facial: debate
+A: Seguridad vs privacidad y vigilancia masiva; más errores con algunos grupos.
+A: Conceptos: power, identity. Contexto: político.
+
+Q: IA y empleo
+A: Automatiza tareas: algunos trabajos desaparecen, otros cambian o aparecen. Contexto: económico.
+
+Q: IA en salud
+A: Diagnóstico por imágenes, descubrimiento de fármacos. Dudas sobre responsabilidad y datos sensibles. Contexto: salud.
+
+Q: Human-in-the-loop
+A: Una persona supervisa o aprueba las decisiones de la IA, sobre todo las de alto impacto.
+
+Q: Evolución de la IA
+A: Conferencia de Dartmouth (1956) → «inviernos de la IA» → deep learning con redes neuronales grandes (desde ~2012) → IA generativa masiva (desde ~2022).
+
+Q: Usos de las redes neuronales
+A: Reconocimiento de imágenes y voz, traducción, procesamiento de lenguaje natural, vehículos autónomos.
+
+Q: Explicabilidad de la IA
+A: Poder entender por qué la IA tomó una decisión. Importa más cuando decide sobre personas (créditos, salud, justicia).
+
+## DS-ROB | D | DS · Robots & autonomous tech | Robots, autonomía y drones
+Q: ¿Qué es un robot? Componentes
+A: Máquina programable que percibe y actúa: sensores (entrada), procesador (decide), actuadores (movimiento o salida).
+
+Q: Sensores comunes
+A: Cámaras, LiDAR, ultrasonido, infrarrojo, GPS, acelerómetro y giroscopio.
+
+Q: Autonomía
+A: Capacidad de operar sin control humano directo, tomando decisiones según el entorno.
+
+Q: Niveles SAE de conducción autónoma
+A: Del 0 (sin automatización) al 5 (totalmente autónomo en cualquier condición).
+
+Q: Ejemplo: accidente de Uber en Tempe (2018)
+A: Un auto autónomo de pruebas atropelló y mató a una peatona. Debate sobre responsabilidad y supervisión humana.
+A: Conceptos: values, systems. Contexto: social.
+
+Q: Drones: usos y debates
+A: Entregas, agricultura, rescate, investigación. También uso militar y vigilancia: privacidad y espacio aéreo.
+
+Q: Robots sociales
+A: Diseñados para interactuar con personas (acompañar adultos mayores, educación). Preguntas sobre apego y engaño emocional.
+
+Q: Automatización industrial
+A: Más productividad y seguridad en fábricas; desplazamiento de trabajadores. Contexto: económico.
+
+Q: Armas autónomas letales
+A: Sistemas que pueden elegir y atacar objetivos sin intervención humana. Debate ético y en la ONU.
+A: Conceptos: values, power.
+
+Q: Robots en entornos peligrosos
+A: Rovers en Marte, desactivación de bombas, desastres nucleares.
+
+Q: Tipos de robots
+A: Industriales, de servicio, sociales, humanoides, drones y vehículos autónomos.
+
+Q: Evolución de los robots
+A: Unimate, primer robot industrial (1961, línea de General Motors) → robots móviles y de servicio → autonomía con IA.
+
+## DS-CTX | D | DS · Contextos | Ejemplos para cada contexto
+Q: Contexto cultural: ejemplo de streaming
+A: El streaming de música cambió cómo se consume y se paga a los artistas: más acceso, pero ingresos muy bajos por reproducción para la mayoría.
+A: Conceptos: change, power.
+
+Q: Contexto cultural: patrimonio digital
+A: Escaneos 3D y museos virtuales preservan patrimonio. Ej.: los escaneos láser de Notre-Dame hechos antes del incendio de 2019 sirven para restaurarla.
+
+Q: Contexto económico: economía de plataformas (gig)
+A: Apps como Uber o Rappi dan flexibilidad, pero los trabajadores suelen no tener seguro ni derechos laborales.
+A: Conceptos: power, change.
+
+Q: Contexto económico: criptomonedas
+A: Monedas digitales descentralizadas. Ej.: El Salvador hizo del bitcoin moneda de curso legal en 2021, con mucha controversia.
+
+Q: Contexto económico: globalización
+A: El comercio electrónico y el trabajo remoto conectan mercados de todo el mundo; también concentran poder en pocas empresas.
+
+Q: Contexto ambiental: centros de datos
+A: Consumen mucha electricidad y agua para enfriarse. La IA aumenta esa demanda.
+A: Conceptos: systems, values.
+
+Q: Contexto ambiental: basura electrónica
+A: Agbogbloshie (Ghana) fue un gran vertedero de e-waste: personas quemaban cables para sacar metales, con graves daños a la salud.
+
+Q: Contexto ambiental: ciudades inteligentes
+A: Sensores para tráfico, energía y residuos. Más eficiencia, pero más vigilancia y dependencia de sistemas.
+
+Q: Contexto de salud: telemedicina
+A: Consultas a distancia; creció mucho durante la pandemia de COVID-19. Mejora el acceso, pero depende de la conectividad.
+
+Q: Contexto de salud: wearables
+A: Relojes que miden ritmo cardíaco o detectan arritmias. Útiles, pero generan datos de salud muy sensibles.
+
+Q: Contexto de conocimiento humano: educación en línea
+A: Cursos masivos (MOOCs) y Wikipedia amplían el acceso al conocimiento; también circulan errores y desinformación.
+
+Q: Contexto político: gobierno digital en Estonia
+A: Casi todos los trámites son en línea y existe voto por internet desde 2005.
+A: Conceptos: systems, power.
+
+Q: Contexto político: drones en conflictos
+A: Drones baratos se usan masivamente en guerras recientes (como en Ucrania): cambian las tácticas y plantean dilemas éticos.
+
+Q: Contexto social: redes sociales e identidad
+A: Moldean cómo los jóvenes se presentan y se comparan; hay debate sobre sus efectos en la salud mental.
+A: Conceptos: identity, expression.
+
+## TOOLS | T | Laboratorio e incertidumbres | Herramientas para Paper 1B, Paper 2 y la IA
+Q: Error aleatorio vs sistemático
+A: Aleatorio: varía en ambas direcciones; se reduce repitiendo y promediando.
+A: Sistemático: desplaza siempre en la misma dirección (ej. error de cero); se reduce calibrando o cambiando el método.
+
+Q: Precisión vs exactitud
+A: Precisión: qué tan cerca están las mediciones entre sí. Exactitud: qué tan cerca están del valor real.
+
+Q: Incertidumbre absoluta, fraccional y porcentual
+A: Absoluta: $\Delta x$. Fraccional: $\dfrac{\Delta x}{x}$. Porcentual: $\dfrac{\Delta x}{x} \times 100$
+
+Q: Propagar incertidumbres en suma y resta
+A: Se suman las incertidumbres absolutas: si $y = a \pm b$, entonces $\Delta y = \Delta a + \Delta b$
+
+Q: Propagar incertidumbres en multiplicación, división y potencias
+A: Se suman las fraccionales: si $y = \dfrac{ab}{c}$, entonces $\dfrac{\Delta y}{y} = \dfrac{\Delta a}{a} + \dfrac{\Delta b}{b} + \dfrac{\Delta c}{c}$
+A: Potencias: si $y = a^n$, entonces $\dfrac{\Delta y}{y} = |n|\dfrac{\Delta a}{a}$
+
+Q: Cifras significativas en el resultado
+A: El resultado no puede tener más cifras significativas que el dato menos preciso. La incertidumbre se da con 1 cifra significativa.
+
+Q: Incertidumbre de un instrumento
+A: Analógico: ± la mitad de la división más pequeña. Digital: ± la última cifra que muestra.
+
+Q: Incertidumbre de la pendiente
+A: Con barras de error se trazan la recta de máxima y de mínima pendiente que pasen por todas las barras.
+A: $\Delta m = \dfrac{m_{\max} - m_{\min}}{2}$
+
+Q: Linealizar datos
+A: Transformar variables para obtener una recta. Ej.: péndulo, $T^2$ vs $l$ da pendiente $\dfrac{4\pi^2}{g}$.
+
+Q: Variables de un experimento
+A: Independiente: la que cambias. Dependiente: la que mides. Controladas: las que mantienes constantes.
+
+Q: Error porcentual respecto al valor aceptado
+A: $\%\ \text{error} = \dfrac{|\text{experimental} - \text{aceptado}|}{\text{aceptado}} \times 100$
+A: Si es mayor que la incertidumbre porcentual, hay error sistemático.
+
+Q: Titulación: buena técnica
+A: Lee la bureta en la base del menisco, a la altura de los ojos. Repite hasta tener titulaciones concordantes (±0.10 cm³).
+
+Q: Colorimetría
+A: La absorbancia es proporcional a la concentración. Se hace una curva de calibración con estándares y se interpola la muestra.
+
+Q: Diluciones seriadas
+A: Diluir repetidamente por el mismo factor (ej. 1:10) para preparar estándares de concentración conocida.
+
+</script>
+
+<script>
+/* ============ MAZO ============ */
+const BLOCKS = [];
+(function parseDeck(){
+  const txt = document.getElementById("deck").textContent;
+  let b = null, c = null;
+  txt.split("\n").forEach(raw => {
+    const line = raw.replace(/\s+$/, "");
+    if (line.startsWith("## ")){
+      const [id, s, name, sub] = line.slice(3).split(" | ");
+      b = {id, s, name, sub, cards:[]}; BLOCKS.push(b); c = null;
+    } else if (/^(Q|H): /.test(line) && b){
+      c = [line.slice(3), "", line[0] === "H"]; b.cards.push(c);
+    } else if (line.startsWith("A: ") && c){
+      c[1] += (c[1] ? "\n" : "") + line.slice(3);
+    }
+  });
+})();
+
+/* ============ PLAN ============ */
+const REF = new Date(2026, 8, 28); // lunes 28 sep 2026 = Semana A
+const PLAN = {
+  0:{1:["Q-S1"],2:["F-A"],3:["DS-DATA","DS-ALG","DS-CON"],4:["Q-S2"],5:["F-B"],6:["DS-COMP","DS-MED","DS-NET"]},
+  1:{1:["Q-S3","Q-R1"],2:["F-C"],3:["DS-AI","DS-ROB","DS-CTX"],4:["Q-R2","Q-R3"],5:["F-D","F-E"],6:["HL","TOOLS"]}
+};
+const DAYNAMES = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+const MONTHS = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+const SUBJ = {Q:"Química HL",F:"Física HL",D:"Digital Society SL",H:"Día HL",T:"Laboratorio",X:"Repaso"};
+const SHORT = {Q:"Química",F:"Física",D:"DS",H:"HL",T:"Lab",X:"Repaso"};
+
+const CARDS = [], BY_ID = {}, BLOCK = {};
+BLOCKS.forEach(b => { BLOCK[b.id] = b; b.cards.forEach((c, i) => { const card = {id:b.id+"-"+(i+1), b:b.id, s:b.s, f:c[0], r:c[1], hl:!!c[2]}; CARDS.push(card); BY_ID[card.id] = card; }); });
+
+function dayNum(d){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return Math.round((x - REF) / 864e5); }
+function dateOf(n){ return new Date(REF.getFullYear(), REF.getMonth(), REF.getDate() + n); }
+function weekOf(n){ return ((Math.floor(n/7) % 2) + 2) % 2; }
+function dowOf(n){ return dateOf(n).getDay(); }
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+
+/* LaTeX: $...$ → MathML con KaTeX; si KaTeX no cargó, muestra el código */
+function texToHtml(tex){
+  try {
+    if (window.katex) return katex.renderToString(tex, {output:"mathml", throwOnError:false, strict:false});
+  } catch(e) {}
+  return `<span class="tex-raw">${esc(tex)}</span>`;
+}
+function rich(s){
+  return String(s).split(/(\$[^$]+\$)/g).map(part => part.length > 2 && part[0] === "$" && part[part.length-1] === "$" ? texToHtml(part.slice(1, -1)) : esc(part)).join("");
+}
+function richBack(s){ return s.split("\n").map(l => `<p>${rich(l)}</p>`).join(""); }
+
+/* ============ ESTADO ============ */
+const FRESH = () => ({v:2, box:{}, seen:{}, days:[], exam:false, hour:"16:00", updatedAt:0});
+let st = FRESH();
+const LS = "tarjetas-ib-v1";
+try { const raw = localStorage.getItem(LS); if (raw) st = Object.assign(FRESH(), JSON.parse(raw)); } catch(e) {}
+let docRef = null, saveTimer = null, saving = false, pending = false, syncLabel = "Guardado en este dispositivo.";
+
+function persistLocal(){ try { localStorage.setItem(LS, JSON.stringify(st)); } catch(e) {} }
+function touch(){ st.updatedAt = Date.now(); scheduleSave(); }
+function scheduleSave(){ persistLocal(); if (!docRef) return; clearTimeout(saveTimer); saveTimer = setTimeout(flush, 1200); }
+async function flush(){
+  if (!docRef) return;
+  if (saving){ pending = true; return; }
+  saving = true;
+  try { await docRef.set(JSON.parse(JSON.stringify(st))); syncLabel = "Progreso sincronizado con tu cuenta."; }
+  catch(e){ syncLabel = "No se pudo sincronizar; queda guardado en este dispositivo."; }
+  saving = false; renderSaveState();
+  if (pending){ pending = false; flush(); }
+}
+async function initSync(){
+  try {
+    if (!window.claude || !claude.use) return;
+    const [dbNs, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!dbNs || !user) return;
+    const uid = await user.id(); if (!uid) return;
+    docRef = dbNs.doc("data/users/" + uid + "/progress");
+    const snap = await docRef.get();
+    if (snap.exists){
+      const remote = snap.data();
+      if ((remote.updatedAt || 0) > (st.updatedAt || 0)){ st = Object.assign(FRESH(), JSON.parse(JSON.stringify(remote))); persistLocal(); if (!session) renderAll(); }
+      else if ((st.updatedAt || 0) > (remote.updatedAt || 0)) flush();
+    } else if (st.updatedAt) flush();
+    syncLabel = "Progreso sincronizado con tu cuenta."; renderSaveState();
+  } catch(e){ docRef = null; }
+}
+
+/* ============ SELECCIÓN ============ */
+const caps = () => st.exam ? {topic:35, fail:20, failSun:30, rest:14} : {topic:20, fail:12, failSun:20, rest:28};
+function today(){ return dayNum(new Date()); }
+function lastSeen(id){ return st.seen[id] ?? -1e9; }
+function boxOf(id){ return st.box[id] || 0; }
+function failedDue(t){
+  return CARDS.filter(c => boxOf(c.id) === 1 && lastSeen(c.id) < t).sort((a,b) => lastSeen(a.id) - lastSeen(b.id));
+}
+function poolFor(blocks){
+  return CARDS.filter(c => blocks.includes(c.b) || (blocks.includes("HL") && c.hl));
+}
+function topicDue(blocks, t, cap){
+  const C = caps();
+  return poolFor(blocks)
+    .filter(c => lastSeen(c.id) !== t && !(boxOf(c.id) === 3 && t - lastSeen(c.id) < C.rest) && boxOf(c.id) !== 1)
+    .sort((a,b) => lastSeen(a.id) - lastSeen(b.id))
+    .slice(0, cap ?? C.topic);
+}
+function blocksFor(week, dow){ return dow === 0 ? [] : PLAN[week][dow]; }
+function labelFor(blocks){
+  if (!blocks.length) return {s:"X", txt:"Solo falladas"};
+  if (blocks[0] === "HL") return {s:"H", txt:"Solo HL (Física y Química) + laboratorio"};
+  return {s:BLOCK[blocks[0]].s, txt:blocks.map(b => BLOCK[b].name.replace("DS · ","")).join(" + ")};
+}
+
+/* Estimación realista: ¿cuándo habrás visto todas las tarjetas al menos una vez? */
+function firstPassEnd(){
+  const unseen = new Set(CARDS.filter(c => !(c.id in st.seen)).map(c => c.id));
+  if (!unseen.size) return {done:true};
+  const cap = caps().topic; let n = today(); if (st.days.includes(n)) n++;
+  for (let k = 0; k < 400 && unseen.size; k++, n++){
+    const dow = dowOf(n); if (dow === 0) continue;
+    const pool = poolFor(blocksFor(weekOf(n), dow)).filter(c => unseen.has(c.id)).slice(0, cap);
+    pool.forEach(c => unseen.delete(c.id));
+    if (!unseen.size) return {done:false, day:n, count:0};
+  }
+  return {done:false, day:null};
+}
+function fmtDate(n){ const d = dateOf(n); return `${DAYNAMES[d.getDay()].toLowerCase()} ${d.getDate()} de ${["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][d.getMonth()]}`; }
+
+/* ============ SESIÓN ============ */
+let session = null, sel = null, tick = null;
+function startSession(opts){
+  const t = today(), C = caps();
+  const fails = opts.noFails ? [] : failedDue(t).slice(0, opts.sunday ? C.failSun : C.fail);
+  const failIds = new Set(fails.map(c => c.id));
+  const topic = opts.blocks.length ? topicDue(opts.blocks, t, opts.cap).filter(c => !failIds.has(c.id)) : [];
+  const queue = [...fails.map(c => ({id:c.id, sec:"Falladas"})), ...topic.map(c => ({id:c.id, sec:opts.sec || "Tema del día"}))];
+  session = {queue, i:0, flipped:false, ok:0, bad:0, start:Date.now(), last:null};
+  clearInterval(tick); tick = setInterval(updateTimer, 1000);
+  renderMain();
+}
+function answer(ok){
+  if (!session || !session.flipped) return;
+  const id = session.queue[session.i].id, t = today();
+  session.last = {id, box:st.box[id], seen:st.seen[id], ok};
+  const cur = boxOf(id);
+  st.box[id] = ok ? (cur === 0 ? 2 : Math.min(cur + 1, 3)) : 1;
+  st.seen[id] = t;
+  if (!st.days.includes(t)){ st.days.push(t); st.days = st.days.slice(-200); }
+  ok ? session.ok++ : session.bad++;
+  session.i++; session.flipped = false;
+  touch(); renderMain(); renderStreak(); renderProgress();
+}
+function undo(){
+  if (!session || !session.last) return;
+  const L = session.last;
+  if (L.box === undefined) delete st.box[L.id]; else st.box[L.id] = L.box;
+  if (L.seen === undefined) delete st.seen[L.id]; else st.seen[L.id] = L.seen;
+  L.ok ? session.ok-- : session.bad--;
+  session.i--; session.flipped = true; session.last = null;
+  touch(); renderMain(); renderProgress();
+}
+function endSession(){ session = null; sel = null; clearInterval(tick); renderAll(); }
+function fmt(ms){ const s = Math.floor(ms/1000); return String(Math.floor(s/60)).padStart(2,"0") + ":" + String(s%60).padStart(2,"0"); }
+function updateTimer(){
+  const el = document.getElementById("timer"); if (!el || !session) return;
+  const ms = Date.now() - session.start, lim = (st.exam ? 25 : 15) * 60000; el.textContent = fmt(ms);
+  const over = ms >= lim; el.classList.toggle("over", over);
+  const b = document.getElementById("overBanner"); if (b) b.hidden = !over;
+}
+
+/* ============ RENDER ============ */
+const main = document.getElementById("main");
+function renderMain(){
+  if (session) return renderSession();
+  const now = new Date(), t = today(), C = caps();
+  const week = sel ? sel.week : weekOf(t), dow = sel ? sel.dow : now.getDay();
+  const blocks = blocksFor(week, dow), lab = labelFor(blocks);
+  const fails = failedDue(t), topic = blocks.length ? topicDue(blocks, t) : [];
+  const nFail = Math.min(fails.length, dow === 0 ? C.failSun : C.fail);
+  const studiedToday = st.days.includes(t);
+  const mins = st.exam ? 25 : 15;
+  const head = sel ? `${DAYNAMES[dow]} · Semana ${week ? "B" : "A"} <button class="linkish" id="backToday">volver a hoy</button>` : `Hoy toca`;
+  const subs = blocks.filter(b => BLOCK[b]).map(b => esc(BLOCK[b].sub)).join(" · ");
+  main.innerHTML = `<div class="today">
+    <div class="what">
+      <div class="eyebrow">${head}</div>
+      <div><span class="chip ${lab.s}">${esc(SUBJ[lab.s])}</span>${st.exam ? ` <span class="chip H">Modo examen</span>` : ""}</div>
+      <div class="blocks">${esc(lab.txt)}</div>
+      ${subs && blocks[0] !== "HL" ? `<div style="color:var(--muted);font-size:.95rem">${subs}</div>` : ""}
+    </div>
+    <div class="counts">
+      <div class="count"><div class="n">${nFail}</div><div class="l">falladas por repasar · ~${st.exam ? 8 : 5} min</div></div>
+      <div class="count"><div class="n">${topic.length}</div><div class="l">${blocks.length ? `tarjetas del tema · ~${st.exam ? 17 : 10} min` : "domingo: sin tema nuevo"}</div></div>
+    </div>
+    ${nFail + topic.length ? `<button class="primary" id="startBtn">Empezar${studiedToday && !sel ? " otra vez" : ""} · ${mins} min</button>` : `<div class="banner">${studiedToday ? "Ya terminaste lo de hoy. Descansa, mañana sigues." : "No hay tarjetas pendientes para este día."}</div>`}
+  </div>`;
+  const sb = document.getElementById("startBtn");
+  if (sb) sb.onclick = () => startSession({blocks, sunday: dow === 0});
+  const bt = document.getElementById("backToday"); if (bt) bt.onclick = () => { sel = null; renderAll(); };
+}
+function renderSession(){
+  const S = session;
+  if (S.i >= S.queue.length){
+    clearInterval(tick);
+    main.innerHTML = `<div class="today done">
+      <div class="eyebrow">Sesión terminada · ${fmt(Date.now() - S.start)}</div>
+      <div class="blocks">Listo por hoy</div>
+      <div class="counts">
+        <div class="count"><div class="n" style="color:var(--ok)">${S.ok}</div><div class="l">la sabías · suben de caja</div></div>
+        <div class="count"><div class="n" style="color:var(--bad)">${S.bad}</div><div class="l">vuelven mañana en falladas</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="primary" id="finBtn">Cerrar</button>
+        ${S.last ? `<button id="undoBtn">Deshacer la última</button>` : ""}
+      </div>
+    </div>`;
+    document.getElementById("finBtn").onclick = endSession;
+    const u = document.getElementById("undoBtn"); if (u) u.onclick = () => { undo(); clearInterval(tick); tick = setInterval(updateTimer, 1000); };
+    return;
+  }
+  const item = S.queue[S.i], c = BY_ID[item.id], blk = BLOCK[c.b];
+  const pct = Math.round(S.i / S.queue.length * 100);
+  main.innerHTML = `<div class="session">
+    <div class="sbar">
+      <span class="eyebrow">${esc(item.sec)} · ${S.i + 1} de ${S.queue.length}</span>
+      <span style="display:flex;gap:14px;align-items:center">
+        ${S.last ? `<button class="linkish" id="undoBtn">Deshacer</button>` : ""}
+        <span class="timer" id="timer">${fmt(Date.now() - S.start)}</span>
+        <button class="linkish" id="quitBtn">Salir</button>
+      </span>
+    </div>
+    <div class="progress"><i style="width:${pct}%"></i></div>
+    <div class="banner" id="overBanner" hidden>Ya pasó tu tiempo. Puedes parar aquí; lo que falta vuelve otro día.</div>
+    <div class="fcard" id="fcard" role="button" tabindex="0" aria-label="Voltear tarjeta">
+      <div class="meta"><span class="chip ${c.s}">${esc(blk.name)}</span>${c.hl ? `<span class="chip H">HL</span>` : ""}</div>
+      <div class="front">${rich(c.f)}</div>
+      ${S.flipped ? `<div class="back">${richBack(c.r)}</div>` : `<div class="hint">Respóndela primero. Luego toca para voltear (o barra espaciadora).</div>`}
+    </div>
+    ${S.flipped ? `<div class="answer">
+      <button class="no" id="noBtn">No la sabía<small>← · vuelve mañana</small></button>
+      <button class="yes" id="yesBtn">La sabía<small>→ · sube de caja</small></button>
+    </div>` : ""}
+  </div>`;
+  const fc = document.getElementById("fcard");
+  fc.onclick = () => { if (!S.flipped){ S.flipped = true; renderSession(); } };
+  if (S.flipped){ document.getElementById("noBtn").onclick = () => answer(false); document.getElementById("yesBtn").onclick = () => answer(true); }
+  document.getElementById("quitBtn").onclick = endSession;
+  const u = document.getElementById("undoBtn"); if (u) u.onclick = undo;
+  updateTimer();
+}
+function renderPlanBox(){
+  const seenCount = CARDS.filter(c => c.id in st.seen).length;
+  const mastered = CARDS.filter(c => boxOf(c.id) === 3).length;
+  document.getElementById("deckcount").textContent = `${CARDS.length} tarjetas · ${seenCount} vistas · ${mastered} dominadas`;
+  const fp = firstPassEnd();
+  const phase = fp.done ? (st.exam ? 3 : 2) : 1;
+  document.getElementById("eta").innerHTML = fp.done
+    ? `Ya viste todas las tarjetas al menos una vez. Ahora toca <b>mantener</b>: las sesiones se acortan porque muchas descansan en caja 3.`
+    : fp.day != null
+      ? `A 15 minutos al día, terminas la primera pasada por todas las tarjetas el <b>${fmtDate(fp.day)}</b>. Faltan ${CARDS.length - seenCount}.`
+      : `Todavía te faltan ${CARDS.length - seenCount} tarjetas por ver.`;
+  const P = [
+    {w:"Fase 1 · hasta ~fin de noviembre", b:"Primera pasada", p:"15 min al día. Ves cada tarjeta al menos una vez. Si una sesión se alarga, paras igual."},
+    {w:"Fase 2 · diciembre a febrero", b:"Mantener", p:"Las mismas 15 min. Casi todo vuelve solo cuando toca, así que muchos días terminarás antes."},
+    {w:"Fase 3 · 6 semanas antes de mocks o exámenes", b:"Modo examen", p:"Activa el modo examen: ~25 min al día y las dominadas vuelven cada 2 semanas. Suma past papers aparte."}
+  ];
+  document.getElementById("phases").innerHTML = P.map((x, i) => `<div class="phase ${i + 1 === phase ? "now" : ""}"><span class="w">${esc(x.w)}</span><b>${esc(x.b)}</b><p>${esc(x.p)}</p></div>`).join("");
+  const hi = document.getElementById("hourInput"); if (document.activeElement !== hi) hi.value = st.hour || "16:00";
+  document.getElementById("examToggle").checked = !!st.exam;
+  const hp = document.getElementById("hourPill"); hp.hidden = false; hp.innerHTML = `Mi hora: <b>${esc(fmtHour(st.hour || "16:00"))}</b>`;
+}
+function fmtHour(h){ const [H, M] = h.split(":").map(Number); const ap = H >= 12 ? "pm" : "am"; return `${((H + 11) % 12) + 1}:${String(M).padStart(2,"0")} ${ap}`; }
+function renderPlan(){
+  const t = today(), wk = weekOf(t), dw = new Date().getDay();
+  let h = `<thead><tr><th>Día</th><th>Semana A</th><th>Semana B</th></tr></thead><tbody>`;
+  [1,2,3,4,5,6,0].forEach(d => {
+    h += `<tr><td><b>${DAYNAMES[d]}</b></td>`;
+    [0,1].forEach(w => {
+      const blocks = blocksFor(w, d), lab = labelFor(blocks), now = w === wk && d === dw;
+      h += `<td class="${now ? "now" : ""}"><button data-w="${w}" data-d="${d}" aria-label="Hacer ${DAYNAMES[d]} semana ${w ? "B" : "A"}">
+        <span><span class="chip ${lab.s}">${esc(SHORT[lab.s])}</span>${now ? ` <span class="eyebrow">hoy</span>` : ""}</span>
+        <span class="t">${esc(lab.txt)}</span></button></td>`;
+    });
+    h += `</tr>`;
+  });
+  document.getElementById("plan").innerHTML = h + `</tbody>`;
+  document.querySelectorAll("#plan button").forEach(b => b.onclick = () => {
+    if (session) return;
+    sel = {week:+b.dataset.w, dow:+b.dataset.d};
+    if (sel.week === wk && sel.dow === dw) sel = null;
+    renderMain(); main.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
+function renderProgress(){
+  const el = document.getElementById("blist");
+  el.innerHTML = BLOCKS.map(b => {
+    const ids = b.cards.map((_, i) => b.id + "-" + (i+1)), n = ids.length, c = [0,0,0,0];
+    ids.forEach(id => c[boxOf(id)]++);
+    const w = k => (c[k] / n * 100).toFixed(1) + "%";
+    return `<button class="brow" data-b="${b.id}" aria-label="Practicar ${esc(b.name)}">
+      <span style="min-width:0"><span class="n">${esc(b.name)}</span> <span class="chip ${b.s}" style="margin-left:4px">${esc(SHORT[b.s])}</span><br><span class="s">${esc(b.sub)} · ${c[3]}/${n} dominadas</span></span>
+      <span class="stack" title="Caja 1: ${c[1]} · Caja 2: ${c[2]} · Caja 3: ${c[3]} · Sin ver: ${c[0]}"><i class="b1" style="width:${w(1)}"></i><i class="b2" style="width:${w(2)}"></i><i class="b3" style="width:${w(3)}"></i></span>
+    </button>`;
+  }).join("");
+  el.querySelectorAll(".brow").forEach(btn => btn.onclick = () => {
+    if (session) return;
+    startSession({blocks:[btn.dataset.b], noFails:true, cap:999, sec:"Repaso de bloque"});
+    main.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
+function renderStreak(){
+  const set = new Set(st.days); let t = today(); if (!set.has(t)) t--;
+  let n = 0; while (set.has(t) || (dowOf(t) === 0 && set.has(t - 1))){ if (set.has(t)) n++; t--; }
+  document.getElementById("streak").innerHTML = `Racha: <b>${n}</b> ${n === 1 ? "día" : "días"}`;
+}
+function renderSaveState(){ const el = document.getElementById("savestate"); if (el) el.textContent = syncLabel; }
+function renderAll(){
+  const now = new Date(), t = today();
+  document.getElementById("dateline").textContent = `${DAYNAMES[now.getDay()]} ${now.getDate()} ${MONTHS[now.getMonth()]} · Semana ${weekOf(t) ? "B" : "A"}`;
+  renderMain(); renderPlanBox(); renderPlan(); renderProgress(); renderStreak(); renderSaveState();
+}
+document.getElementById("hourInput").addEventListener("change", e => { st.hour = e.target.value || "16:00"; touch(); renderPlanBox(); });
+document.getElementById("examToggle").addEventListener("change", e => { st.exam = e.target.checked; touch(); if (!session) renderMain(); renderPlanBox(); });
+document.addEventListener("keydown", e => {
+  if (!session || session.i >= session.queue.length) return;
+  if (["BUTTON","INPUT"].includes(e.target.tagName) && (e.key === " " || e.key === "Enter")) return;
+  if ((e.key === " " || e.key === "Enter") && !session.flipped){ e.preventDefault(); session.flipped = true; renderSession(); }
+  else if (session.flipped && (e.key === "ArrowLeft" || e.key === "1")) answer(false);
+  else if (session.flipped && (e.key === "ArrowRight" || e.key === "2")) answer(true);
+});
+renderAll();
+initSync();
+</script>
+
+</body>
+</html>
